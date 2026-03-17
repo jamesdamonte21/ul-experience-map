@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UL Experience Map — Sign In</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:'Sora',-apple-system,sans-serif;background:#07080D;color:#E8EEFF;-webkit-font-smoothing:antialiased}
+
+body::before{
+  content:'';position:fixed;inset:0;
+  background:radial-gradient(ellipse 80% 60% at 50% -5%,rgba(123,92,255,.13) 0%,transparent 65%),
+             radial-gradient(ellipse 40% 40% at 80% 80%,rgba(0,89,153,.07) 0%,transparent 60%);
+  pointer-events:none;
+}
+body::after{
+  content:'';position:fixed;inset:0;
+  background-image:radial-gradient(rgba(255,255,255,.025) 1px,transparent 1px);
+  background-size:28px 28px;pointer-events:none;
+}
+
+.page{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;position:relative;z-index:1}
+
+/* card */
+.card{width:100%;max-width:400px;background:#0E1018;border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:40px 36px;box-shadow:0 24px 80px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.04)}
+
+/* logo */
+.logo-wrap{display:flex;justify-content:center;margin-bottom:32px}
+.logo-wrap svg{height:28px;width:auto}
+
+/* headings */
+.card-title{font-size:18px;font-weight:800;letter-spacing:-.3px;color:#E8EEFF;text-align:center;margin-bottom:6px}
+.card-sub{font-size:11.5px;color:#526075;text-align:center;margin-bottom:32px;font-weight:500;font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.8px}
+
+/* divider */
+.divider{height:1px;background:rgba(255,255,255,.06);margin-bottom:28px}
+
+/* form */
+.field{margin-bottom:16px}
+.field label{display:block;font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#526075;font-family:'JetBrains Mono',monospace;margin-bottom:7px}
+.field input{
+  width:100%;padding:11px 14px;
+  background:#141720;
+  border:1px solid rgba(255,255,255,.09);
+  border-radius:8px;
+  font-size:13px;font-family:'Sora',sans-serif;
+  color:#E8EEFF;outline:none;
+  transition:border-color 170ms ease,box-shadow 170ms ease;
+}
+.field input::placeholder{color:#3E4A5C}
+.field input:focus{border-color:rgba(123,92,255,.5);box-shadow:0 0 0 3px rgba(123,92,255,.12)}
+
+/* button */
+.btn{
+  width:100%;margin-top:8px;padding:12px;
+  background:linear-gradient(135deg,#5B3FD6 0%,#7B5CFF 100%);
+  border:none;border-radius:8px;
+  font-size:13px;font-weight:700;font-family:'Sora',sans-serif;
+  color:#fff;cursor:pointer;
+  transition:filter 170ms ease,transform 170ms ease;
+  box-shadow:0 4px 16px rgba(123,92,255,.3);
+}
+.btn:hover{filter:brightness(1.1)}
+.btn:active{transform:scale(.99)}
+.btn:disabled{opacity:.5;cursor:not-allowed;filter:none}
+
+/* error */
+.error{
+  margin-top:14px;padding:10px 14px;
+  background:rgba(255,76,76,.1);
+  border:1px solid rgba(255,76,76,.2);
+  border-radius:7px;
+  font-size:12px;color:#FF9090;
+  display:none;
+}
+.error.show{display:block}
+
+/* footer */
+.footer{margin-top:28px;text-align:center;font-size:10px;color:#3E4A5C;font-family:'JetBrains Mono',monospace;letter-spacing:.4px}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="card">
+
+    <div class="logo-wrap">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 486.8 200">
+        <defs>
+          <linearGradient id="lg1" gradientUnits="userSpaceOnUse" x1="-366.82" y1="202.18" x2="-559.98" y2="202.18" gradientTransform="matrix(-1 0 0 -1 -340.89 316.68)">
+            <stop offset="0" style="stop-color:#CA0123"/><stop offset="0.15" style="stop-color:#C10123"/>
+            <stop offset="0.4" style="stop-color:#A90224"/><stop offset="0.71" style="stop-color:#810326"/>
+            <stop offset="0.97" style="stop-color:#5B0428"/>
+          </linearGradient>
+          <linearGradient id="lg2" gradientUnits="userSpaceOnUse" x1="157.8582" y1="248.2378" x2="16.1281" y2="367.1578" gradientTransform="matrix(1 0 0 1 0 -196)">
+            <stop offset="0" style="stop-color:#CA0123"/><stop offset="0.15" style="stop-color:#C10123"/>
+            <stop offset="0.4" style="stop-color:#A90224"/><stop offset="0.71" style="stop-color:#810326"/>
+            <stop offset="0.97" style="stop-color:#5B0428"/>
+          </linearGradient>
+        </defs>
+        <path fill="url(#lg1)" d="M95.5,175c43.5,0,74.5-35,74.5-75s-31.5-70-70-70c-4,0-9,0.5-11.5,1c4.5-1.5,12-2,16-2c51,0,81.5,41,81.5,85c0,51.5-38.5,86-86,86C45,200,0,155,0,100c0-19.5,6-45,26.5-67.5c-13,18-16.5,36-16.5,54C10,133,41.5,175,95.5,175z"/>
+        <path fill="url(#lg2)" d="M104.5,25C61,25,30,60,30,100s31.5,70,70,70c4,0,9-0.5,11.5-1c-4.5,1.5-12,2-16,2c-51,0-81.5-41-81.5-85c0-51.5,38.5-86,86-86c55,0,100,45,100,100c0,19.5-6,45-26.5,67.5c13-18,16.5-36,16.5-54C190,67,158.5,25,104.5,25z"/>
+        <path fill="#CA0123" d="M245.1,124.8c-10,0-15.5-6-16-15.5h9.5c0,5,2.5,7.5,6,7.5c2.5,0,5-1,5-4.5s-2.5-5.5-7-8l-3.5-2c-5-2.5-9-6-9-13c0-9,6.5-13.5,15-13.5c9,0,14.5,5.5,14.5,14.5h-9.5c-0.5-5-2-7.5-5.5-7.5c-3,0-4.5,2-4.5,4.5c0,3.5,3,5.5,6.5,7.5l3,2c3.5,2,10,5.5,10,14.5C260.1,120.8,252.6,124.8,245.1,124.8z M279.1,124.3c8.5,0,15.5-6,15.5-18s-7-18-15.5-18s-15.5,6.5-15.5,18C263.6,118.4,270.6,124.8,279.1,124.3z M279.1,116.4c-3.5,0-6-3.5-6-10s2.5-10,6-10s6,3.5,6,10S283.1,116.4,279.1,116.4z M299.6,124.3h9.5V74.9h-9.5V124.3z M344,123.8v-34h-9.5v21c0,4-2,6-5,6s-5-2-5-6V89.3H315v23.5c0,7.5,4,12,10.5,12c4.5,0,7-2,8.5-4.5h0.5l1,3.5H344z M382.5,84.9c3,0,5.5-2.5,5.5-5.5s-2.5-5.5-5.5-5.5c-3.5,0-6,2.5-6,5.5S379.5,84.9,382.5,84.9z M377.5,123.8h9.5V89.3h-9.5V123.8z M407.9,124.3c8.5,0,15.5-6,15.5-18s-7-18-15.5-18s-15.5,6.5-15.5,18C392.4,118.4,399.4,124.3,407.9,124.3z M407.9,116.4c-3.5,0-6-3.5-6-10s2.5-10,6-10s6,3.5,6,10S411.4,116.4,407.9,116.4z M474.3,123.8c6.5,0,12.5-3,12.5-10s-5-9.5-9.5-11l-2.5-1c-2.5-1-4.5-2-4.5-4s1-3,3-3c2.5,0,4,1.5,4,4h9c0-6-4.5-10.5-12.5-10.5c-7,0-12.5,3.5-12.5,10.5c0,6.5,5,8.5,9,10l2.5,1c3,1,5,2,5,4.5c0,2-1.5,3-3.5,3c-2.5,0-4-1-4.5-4.5h-9C461.4,120.3,465.8,124.3,474.3,123.8z M364.5,124.3c2,0,4.5,0,6-0.5v-7c-1,0.5-2,0.5-3,0.5c-3,0-4-2-4-4V96.8h8.5v-7.5h-8.5v-9H355v4c0,3.5-1.5,5-5,5h-1.5v7.5h6v18C354.5,120.3,357.5,124.8,364.5,124.3z M427.9,89.4v34.5h9.5v-21c0-4.5,2-6.5,5-6.5s5,2,5,6v21.5h9.5v-23.5c0-7.5-4-12-10.5-12c-4.5,0-7,2-8.5,4.5h-0.5l-1-3.5H427.9z M56.6,52.5v50.1c0,14.2,8,20.8,21.8,20.8c16.6,0,21.8-9,21.8-20.8V52.5H84v51.8c0,2.9-1.3,6.6-5.5,6.6c-4.6,0-5.6-2.9-5.6-6.2V52.5H56.6 M106.6,146.8V77.5h16.2v55.4h19.8v13.9L106.6,146.8"/>
+      </svg>
+    </div>
+
+    <div class="card-title">Internal Experience Map</div>
+    <div class="card-sub">Restricted Access</div>
+    <div class="divider"></div>
+
+    <form id="loginForm">
+      <div class="field">
+        <label>Username</label>
+        <input type="text" id="username" placeholder="ux-admin" autocomplete="username" autocapitalize="none" spellcheck="false">
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <input type="password" id="password" placeholder="••••••••" autocomplete="current-password">
+      </div>
+      <button class="btn" type="submit" id="submitBtn">Sign In</button>
+      <div class="error" id="errorMsg">Invalid username or password. Please try again.</div>
+    </form>
+
+  </div>
+  <div class="footer">UL Solutions · Testing, Inspection &amp; Certification</div>
+</div>
+
+<script>
+const { createClient } = supabase;
+const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// If already logged in, go straight to the app
+sb.auth.getSession().then(({ data: { session } }) => {
+  if (session) window.location.replace('/index.html');
+});
+
+document.getElementById('loginForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const username = document.getElementById('username').value.trim();
+  const password = document.getElementById('password').value;
+  const btn = document.getElementById('submitBtn');
+  const err = document.getElementById('errorMsg');
+
+  if (!username || !password) return;
+
+  btn.disabled = true;
+  btn.textContent = 'Signing in…';
+  err.classList.remove('show');
+
+  // Map username → email used in Supabase
+  const email = `${username}@ul-experience-map.app`;
+
+  const { error } = await sb.auth.signInWithPassword({ email, password });
+
+  if (error) {
+    err.classList.add('show');
+    btn.disabled = false;
+    btn.textContent = 'Sign In';
+  } else {
+    window.location.replace('/index.html');
+  }
+});
+</script>
+</body>
+</html>
