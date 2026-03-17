@@ -1,0 +1,8 @@
+# credentials — only needed if you ever rotate to a private key
+# config.js
+
+# files not needed on Vercel
+*.xlsx
+schema.sql
+seed.sql
+experience_map.png
