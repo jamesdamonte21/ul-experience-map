@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Import — UL Experience Map</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#07080D;--surface:#0E1018;--surface-2:#141720;--surface-3:#1A1E2C;
+  --border:rgba(255,255,255,.07);--border-strong:rgba(255,255,255,.13);
+  --text:#E8EEFF;--text2:#98AECA;--muted:#526075;
+  --accent:#7B5CFF;--accent-light:rgba(123,92,255,.15);
+  --green:#00D47E;--red:#FF4C4C;--amber:#F5A522;
+  --radius:9px;--ease:170ms cubic-bezier(.4,0,.2,1);
+}
+html,body{height:100%;font-family:'Sora',-apple-system,sans-serif;background:var(--bg);color:var(--text);font-size:13px;-webkit-font-smoothing:antialiased}
+
+/* ── HEADER ── */
+.app-header{height:56px;background:rgba(7,8,13,.95);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;gap:14px;backdrop-filter:blur(12px);flex-shrink:0}
+.hdr-logo{height:26px;flex-shrink:0}
+.hdr-logo svg{height:100%;width:auto}
+.hdr-title{font-size:13px;font-weight:700;color:#DDE5FF;letter-spacing:-.2px}
+.hdr-badge{padding:2px 9px;background:rgba(0,212,126,.12);color:#00D47E;border-radius:20px;font-size:10px;font-weight:700;border:1px solid rgba(0,212,126,.2);font-family:'JetBrains Mono',monospace}
+.hdr-spacer{flex:1}
+.hdr-user{font-size:11px;color:var(--muted);font-family:'JetBrains Mono',monospace}
+.hdr-btn{padding:6px 14px;border-radius:7px;font-size:11.5px;font-weight:600;font-family:inherit;cursor:pointer;transition:all var(--ease);border:1px solid var(--border);background:var(--surface-2);color:var(--text2);text-decoration:none;display:inline-flex;align-items:center}
+.hdr-btn:hover{border-color:var(--border-strong);color:var(--text)}
+
+/* ── AUTH GUARD ── */
+.auth-guard{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;z-index:200;color:var(--text2);font-size:13px}
+.spin{width:28px;height:28px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── BODY ── */
+.app{display:flex;flex-direction:column;height:100%}
+.importer-body{flex:1;overflow-y:auto;padding:36px 24px 60px;display:flex;flex-direction:column;align-items:center}
+.importer-body::-webkit-scrollbar{width:6px}
+.importer-body::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:3px}
+.importer-inner{width:100%;max-width:860px}
+
+/* ── STEPPER ── */
+.stepper{display:flex;align-items:center;margin-bottom:36px}
+.step-item{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.step-circle{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;font-family:'JetBrains Mono',monospace;border:1.5px solid var(--border-strong);color:var(--muted);background:var(--surface);transition:all .3s;flex-shrink:0}
+.step-label{font-size:12px;font-weight:600;color:var(--muted);transition:color .3s;white-space:nowrap}
+.step-line{flex:1;height:1px;background:var(--border);margin:0 12px;transition:background .3s}
+.step-item.active .step-circle{border-color:var(--accent);color:#fff;background:var(--accent);box-shadow:0 0 16px rgba(123,92,255,.4)}
+.step-item.active .step-label{color:var(--text)}
+.step-item.done .step-circle{border-color:var(--green);color:var(--green);background:rgba(0,212,126,.1)}
+.step-item.done .step-label{color:var(--text2)}
+.step-line.done{background:var(--green);opacity:.4}
+
+/* ── STEP PANELS ── */
+.step-panel{display:none;animation:fadeUp .25s ease-out}
+.step-panel.active{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── STEP HEADERS ── */
+.step-title{font-size:18px;font-weight:700;letter-spacing:-.3px;margin-bottom:4px}
+.step-sub{font-size:12px;color:var(--muted);margin-bottom:24px}
+
+/* ── UPLOAD ZONE ── */
+.upload-zone{border:2px dashed var(--border-strong);border-radius:14px;padding:56px 32px;display:flex;flex-direction:column;align-items:center;gap:16px;cursor:pointer;transition:all .25s;background:var(--surface);text-align:center}
+.upload-zone:hover,.upload-zone.drag-over{border-color:var(--accent);background:var(--accent-light)}
+.upload-zone-icon{width:56px;height:56px;border-radius:14px;background:var(--surface-2);border:1px solid var(--border-strong);display:flex;align-items:center;justify-content:center}
+.upload-zone-icon svg{width:26px;height:26px;color:var(--text2)}
+.upload-zone-title{font-size:14px;font-weight:700;color:var(--text)}
+.upload-zone-sub{font-size:11.5px;color:var(--muted)}
+.upload-btn{padding:8px 22px;border-radius:8px;font-size:12px;font-weight:700;font-family:inherit;cursor:pointer;border:1px solid var(--border-strong);background:var(--surface-2);color:var(--text2);transition:all var(--ease)}
+.upload-btn:hover{border-color:var(--accent);color:var(--text);background:var(--accent-light)}
+.file-info-bar{margin-top:16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px 16px;display:flex;align-items:center;gap:12px}
+.file-info-icon{width:32px;height:32px;border-radius:7px;background:rgba(0,212,126,.1);border:1px solid rgba(0,212,126,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.file-info-name{font-size:12.5px;font-weight:600;color:var(--text)}
+.file-info-meta{font-size:11px;color:var(--muted);font-family:'JetBrains Mono',monospace;margin-top:2px}
+.file-info-change{margin-left:auto;font-size:11px;color:var(--accent);cursor:pointer;font-weight:600;padding:4px 8px;border-radius:5px;transition:background var(--ease)}
+.file-info-change:hover{background:var(--accent-light)}
+
+/* ── COLUMN MAPPER ── */
+.mapper-table{width:100%;border-collapse:collapse;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.mapper-table th{padding:9px 14px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;border-bottom:1px solid var(--border);color:var(--text2);font-family:'JetBrains Mono',monospace;text-align:left}
+.mapper-table td{padding:8px 14px;border-bottom:1px solid var(--border);vertical-align:middle}
+.mapper-table tr:last-child td{border-bottom:none}
+.mapper-table tr:hover td{background:rgba(255,255,255,.018)}
+.col-name-cell{font-size:12px;font-weight:600;color:var(--text);font-family:'JetBrains Mono',monospace}
+.col-preview-cell{font-size:11px;color:var(--muted);max-width:220px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.col-select{width:100%;padding:6px 10px;background:var(--surface-2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:12px;font-family:inherit;cursor:pointer;outline:none;transition:border-color var(--ease)}
+.col-select:focus{border-color:rgba(123,92,255,.5)}
+.col-select.mapped{border-color:rgba(0,212,126,.35);color:var(--green)}
+.col-select option{background:var(--surface-2)}
+.mapper-help{margin-top:12px;padding:12px 14px;background:rgba(123,92,255,.06);border:1px solid rgba(123,92,255,.15);border-radius:var(--radius);font-size:11.5px;color:var(--text2);line-height:1.6}
+.mapper-help strong{color:var(--text);font-weight:600}
+
+/* ── NAV BUTTONS ── */
+.step-actions{display:flex;align-items:center;gap:10px;margin-top:24px}
+.btn{padding:9px 22px;border-radius:8px;font-size:12.5px;font-weight:700;font-family:inherit;cursor:pointer;transition:all var(--ease);border:1px solid var(--border);background:var(--surface-2);color:var(--text2)}
+.btn:hover{border-color:var(--border-strong);color:var(--text)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.primary:hover{background:#6B4FE8;box-shadow:0 4px 16px rgba(123,92,255,.35)}
+.btn.primary:disabled{opacity:.45;cursor:not-allowed;box-shadow:none}
+.btn.danger{background:rgba(255,76,76,.1);border-color:rgba(255,76,76,.3);color:var(--red)}
+.btn.danger:hover{background:rgba(255,76,76,.18)}
+.btn-back{background:transparent;border-color:transparent;color:var(--text2);padding-left:8px}
+.btn-back:hover{color:var(--text);background:transparent;border-color:transparent}
+
+/* ── PREVIEW ── */
+.preview-stats{display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap}
+.stat-chip{display:flex;align-items:center;gap:7px;padding:8px 14px;border-radius:8px;font-size:12px;font-weight:600;border:1px solid var(--border);background:var(--surface);cursor:pointer;transition:all var(--ease);user-select:none}
+.stat-chip:hover{border-color:var(--border-strong)}
+.stat-chip.active{border-color:var(--accent);background:var(--accent-light)}
+.stat-chip .count{font-family:'JetBrains Mono',monospace;font-size:11px;padding:1px 6px;border-radius:4px}
+.stat-chip.all .count{background:rgba(255,255,255,.07);color:var(--text2)}
+.stat-chip.new-chip .count{background:rgba(0,212,126,.12);color:var(--green)}
+.stat-chip.overwrite-chip .count{background:rgba(245,165,34,.12);color:var(--amber)}
+.stat-chip.skip-chip .count{background:rgba(255,76,76,.1);color:var(--red)}
+
+.preview-table-wrap{border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;overflow-x:auto}
+.preview-table{width:100%;border-collapse:collapse;min-width:620px}
+.preview-table th{padding:9px 12px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;border-bottom:1px solid var(--border);color:var(--text2);font-family:'JetBrains Mono',monospace;text-align:left;background:var(--surface);white-space:nowrap}
+.preview-table td{padding:9px 12px;border-bottom:1px solid var(--border);font-size:12px;vertical-align:middle}
+.preview-table tr:last-child td{border-bottom:none}
+.preview-table tbody tr:hover td{background:rgba(255,255,255,.018)}
+.phase-dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:6px;vertical-align:middle;flex-shrink:0}
+.row-type-badge{display:inline-flex;padding:2px 8px;border-radius:5px;font-size:9.5px;font-weight:700;font-family:'JetBrains Mono',monospace;background:rgba(255,255,255,.06);color:var(--text2);border:1px solid var(--border)}
+.value-cell{max-width:220px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--text);font-size:11.5px}
+.existing-cell{max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--muted);font-size:11px;font-style:italic}
+.status-badge{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:20px;font-size:10px;font-weight:700;font-family:'JetBrains Mono',monospace;white-space:nowrap}
+.status-badge.new{background:rgba(0,212,126,.1);color:var(--green);border:1px solid rgba(0,212,126,.2)}
+.status-badge.overwrite{background:rgba(245,165,34,.1);color:var(--amber);border:1px solid rgba(245,165,34,.2)}
+.status-badge.skip{background:rgba(255,76,76,.08);color:#FF8080;border:1px solid rgba(255,76,76,.18)}
+.status-badge.force{background:rgba(123,92,255,.1);color:#A898FF;border:1px solid rgba(123,92,255,.25)}
+.no-results{padding:40px;text-align:center;color:var(--muted);font-size:12px}
+
+/* ── FORCE OVERWRITE TOGGLE ── */
+.force-toggle{display:flex;align-items:center;gap:10px;padding:12px 16px;background:rgba(255,76,76,.05);border:1px solid rgba(255,76,76,.15);border-radius:var(--radius);margin-bottom:18px;cursor:pointer;transition:all var(--ease)}
+.force-toggle:hover{background:rgba(255,76,76,.09)}
+.force-toggle input[type=checkbox]{width:16px;height:16px;accent-color:var(--red);cursor:pointer;flex-shrink:0}
+.force-toggle-text{flex:1}
+.force-toggle-label{font-size:12.5px;font-weight:600;color:var(--text)}
+.force-toggle-desc{font-size:11px;color:var(--muted);margin-top:2px}
+
+/* ── IMPORT PROGRESS ── */
+.import-progress-wrap{height:4px;background:var(--border);border-radius:2px;overflow:hidden;margin-bottom:14px;display:none}
+.import-progress-bar{height:100%;background:linear-gradient(90deg,var(--accent),var(--green));border-radius:2px;transition:width .2s ease-out;width:0}
+.import-result{padding:16px;background:rgba(0,212,126,.07);border:1px solid rgba(0,212,126,.2);border-radius:var(--radius);font-size:13px;font-weight:600;color:var(--green);display:none;align-items:center;gap:10px;margin-top:12px}
+.import-result svg{width:18px;height:18px;flex-shrink:0}
+
+/* ── EMPTY / LOADING ── */
+.empty-state{padding:48px;text-align:center;color:var(--muted);font-size:12px}
+.loading-inline{display:inline-flex;align-items:center;gap:8px;color:var(--muted);font-size:12px}
+.spin-sm{width:14px;height:14px;border:1.5px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--surface-2);color:var(--text);padding:9px 18px;border-radius:8px;font-size:12px;font-weight:600;box-shadow:0 6px 24px rgba(0,0,0,.5);transition:transform .28s cubic-bezier(.4,0,.2,1);z-index:999;border:1px solid var(--border-strong);white-space:nowrap;pointer-events:none}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.toast.success{border-color:rgba(0,212,126,.3);color:var(--green)}
+.toast.error{border-color:rgba(255,76,76,.3);color:var(--red)}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <!-- HEADER -->
+  <header class="app-header">
+    <div class="hdr-logo">
+      <svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 486.8 200"><defs><linearGradient id="ig1" gradientUnits="userSpaceOnUse" x1="-366.82" y1="202.18" x2="-559.98" y2="202.18" gradientTransform="matrix(-1 0 0 -1 -340.89 316.68)"><stop offset="0" style="stop-color:#CA0123"/><stop offset=".97" style="stop-color:#5B0428"/></linearGradient><linearGradient id="ig2" gradientUnits="userSpaceOnUse" x1="157.86" y1="248.24" x2="16.13" y2="367.16" gradientTransform="matrix(1 0 0 1 0 -196)"><stop offset="0" style="stop-color:#CA0123"/><stop offset=".97" style="stop-color:#5B0428"/></linearGradient></defs><path fill="url(#ig1)" d="M95.5,175c43.5,0,74.5-35,74.5-75s-31.5-70-70-70c-4,0-9,0.5-11.5,1c4.5-1.5,12-2,16-2c51,0,81.5,41,81.5,85c0,51.5-38.5,86-86,86C45,200,0,155,0,100c0-19.5,6-45,26.5-67.5c-13,18-16.5,36-16.5,54C10,133,41.5,175,95.5,175z"/><path fill="url(#ig2)" d="M104.5,25C61,25,30,60,30,100s31.5,70,70,70c4,0,9-0.5,11.5-1c-4.5,1.5-12,2-16,2c-51,0-81.5-41-81.5-85c0-51.5,38.5-86,86-86c55,0,100,45,100,100c0,19.5-6,45-26.5,67.5c13-18,16.5-36,16.5-54C190,67,158.5,25,104.5,25z"/><path fill="#CA0123" d="M245.1,124.8c-10,0-15.5-6-16-15.5h9.5c0,5,2.5,7.5,6,7.5c2.5,0,5-1,5-4.5s-2.5-5.5-7-8l-3.5-2c-5-2.5-9-6-9-13c0-9,6.5-13.5,15-13.5c9,0,14.5,5.5,14.5,14.5h-9.5c-0.5-5-2-7.5-5.5-7.5c-3,0-4.5,2-4.5,4.5c0,3.5,3,5.5,6.5,7.5l3,2c3.5,2,10,5.5,10,14.5C260.1,120.8,252.6,124.8,245.1,124.8z M279.1,124.3c8.5,0,15.5-6,15.5-18s-7-18-15.5-18s-15.5,6.5-15.5,18C263.6,118.4,270.6,124.8,279.1,124.3z M279.1,116.4c-3.5,0-6-3.5-6-10s2.5-10,6-10s6,3.5,6,10S283.1,116.4,279.1,116.4z M299.6,124.3h9.5V74.9h-9.5V124.3z M344,123.8v-34h-9.5v21c0,4-2,6-5,6s-5-2-5-6V89.3H315v23.5c0,7.5,4,12,10.5,12c4.5,0,7-2,8.5-4.5h0.5l1,3.5H344z M382.5,84.9c3,0,5.5-2.5,5.5-5.5s-2.5-5.5-5.5-5.5c-3.5,0-6,2.5-6,5.5S379.5,84.9,382.5,84.9z M377.5,123.8h9.5V89.3h-9.5V123.8z M407.9,124.3c8.5,0,15.5-6,15.5-18s-7-18-15.5-18s-15.5,6.5-15.5,18C392.4,118.4,399.4,124.3,407.9,124.3z M407.9,116.4c-3.5,0-6-3.5-6-10s2.5-10,6-10s6,3.5,6,10S411.4,116.4,407.9,116.4z M474.3,123.8c6.5,0,12.5-3,12.5-10s-5-9.5-9.5-11l-2.5-1c-2.5-1-4.5-2-4.5-4s1-3,3-3c2.5,0,4,1.5,4,4h9c0-6-4.5-10.5-12.5-10.5c-7,0-12.5,3.5-12.5,10.5c0,6.5,5,8.5,9,10l2.5,1c3,1,5,2,5,4.5c0,2-1.5,3-3.5,3c-2.5,0-4-1-4.5-4.5h-9C461.4,120.3,465.8,124.3,474.3,123.8z M364.5,124.3c2,0,4.5,0,6-0.5v-7c-1,0.5-2,0.5-3,0.5c-3,0-4-2-4-4V96.8h8.5v-7.5h-8.5v-9H355v4c0,3.5-1.5,5-5,5h-1.5v7.5h6v18C354.5,120.3,357.5,124.8,364.5,124.3z M427.9,89.4v34.5h9.5v-21c0-4.5,2-6.5,5-6.5s5,2,5,6v21.5h9.5v-23.5c0-7.5-4-12-10.5-12c-4.5,0-7,2-8.5,4.5h-0.5l-1-3.5H427.9z M56.6,52.5v50.1c0,14.2,8,20.8,21.8,20.8c16.6,0,21.8-9,21.8-20.8V52.5H84v51.8c0,2.9-1.3,6.6-5.5,6.6c-4.6,0-5.6-2.9-5.6-6.2V52.5H56.6 M106.6,146.8V77.5h16.2v55.4h19.8v13.9L106.6,146.8"/></svg>
+    </div>
+    <div class="hdr-title">Experience Map Import</div>
+    <div class="hdr-badge">IMPORT</div>
+    <div class="hdr-spacer"></div>
+    <span class="hdr-user" id="hdrUser"></span>
+    <a href="/admin.html" class="hdr-btn">← Admin</a>
+    <a href="/" class="hdr-btn">View Map</a>
+  </header>
+
+  <!-- AUTH GUARD -->
+  <div class="auth-guard" id="authGuard">
+    <div class="spin"></div>
+    <div>Verifying admin access…</div>
+  </div>
+
+  <!-- IMPORTER BODY -->
+  <div class="importer-body" id="importerBody" hidden>
+    <div class="importer-inner">
+
+      <!-- STEPPER -->
+      <div class="stepper">
+        <div class="step-item active" id="si1">
+          <div class="step-circle" id="sc1">1</div>
+          <span class="step-label">Upload File</span>
+        </div>
+        <div class="step-line" id="sl1"></div>
+        <div class="step-item" id="si2">
+          <div class="step-circle" id="sc2">2</div>
+          <span class="step-label">Map Columns</span>
+        </div>
+        <div class="step-line" id="sl2"></div>
+        <div class="step-item" id="si3">
+          <div class="step-circle" id="sc3">3</div>
+          <span class="step-label">Preview &amp; Import</span>
+        </div>
+      </div>
+
+      <!-- ══ STEP 1: UPLOAD ══ -->
+      <div id="s1" class="step-panel active">
+        <div class="step-title">Upload your Excel or CSV file</div>
+        <div class="step-sub">Drag &amp; drop or click to browse. Supported formats: .xlsx, .xls, .csv</div>
+
+        <div class="upload-zone" id="dropZone">
+          <div class="upload-zone-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="17 8 12 3 7 8"/>
+              <line x1="12" y1="3" x2="12" y2="15"/>
+            </svg>
+          </div>
+          <div class="upload-zone-title">Drop file here or</div>
+          <button class="upload-btn" id="browseBtn">Browse files</button>
+          <div class="upload-zone-sub">Excel (.xlsx, .xls) or CSV format</div>
+          <input type="file" id="fileInput" accept=".xlsx,.xls,.csv" style="display:none">
+        </div>
+
+        <div id="fileInfoBar" style="display:none" class="file-info-bar">
+          <div class="file-info-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00D47E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+          </div>
+          <div>
+            <div class="file-info-name" id="fileInfoName"></div>
+            <div class="file-info-meta" id="fileInfoMeta"></div>
+          </div>
+          <span class="file-info-change" id="changeFileBtn">Change file</span>
+        </div>
+
+        <div class="step-actions">
+          <button class="btn primary" id="s1Next" disabled onclick="goToStep(2)">
+            Next: Map Columns →
+          </button>
+        </div>
+      </div>
+
+      <!-- ══ STEP 2: MAP COLUMNS ══ -->
+      <div id="s2" class="step-panel">
+        <div class="step-title">Map columns to content fields</div>
+        <div class="step-sub">Tell us what each column in your file represents. At minimum, designate one column as the Phase Identifier.</div>
+
+        <table class="mapper-table" id="mapperTable">
+          <thead>
+            <tr>
+              <th style="width:160px">Column Name</th>
+              <th>Preview (first 3 values)</th>
+              <th style="width:260px">Maps to</th>
+            </tr>
+          </thead>
+          <tbody id="mapperBody"></tbody>
+        </table>
+
+        <div class="mapper-help">
+          <strong>Tips:</strong> Set one column to <em>Phase Identifier</em> — it should contain values like "P1", "Intake &amp; Scoping", or simply the row number. Columns set to <em>Ignore</em> are skipped. For the Future State row, use the two separate <em>Future State — Current</em> and <em>Future State — Proposed</em> options.
+        </div>
+
+        <div class="step-actions">
+          <button class="btn btn-back" onclick="goToStep(1)">← Back</button>
+          <button class="btn primary" id="s2Next" onclick="computeAndShowPreview()">
+            Next: Preview →
+          </button>
+        </div>
+      </div>
+
+      <!-- ══ STEP 3: PREVIEW & IMPORT ══ -->
+      <div id="s3" class="step-panel">
+        <div class="step-title">Review changes before importing</div>
+        <div class="step-sub">Check what will be created, updated, or skipped. Cells marked <strong style="color:#FF8080">Skipped</strong> were edited manually in the UI and are protected.</div>
+
+        <!-- Stats filter bar -->
+        <div class="preview-stats" id="previewStats"></div>
+
+        <!-- Force overwrite toggle -->
+        <label class="force-toggle" id="forceToggle">
+          <input type="checkbox" id="forceOverwrite" onchange="renderPreviewTable()">
+          <div class="force-toggle-text">
+            <div class="force-toggle-label">Force overwrite manually-edited cells</div>
+            <div class="force-toggle-desc">When checked, cells previously edited through the admin UI will also be overwritten. Use with caution.</div>
+          </div>
+        </label>
+
+        <!-- Preview table -->
+        <div class="preview-table-wrap">
+          <table class="preview-table" id="previewTable">
+            <thead>
+              <tr>
+                <th>Phase</th>
+                <th>Row Type</th>
+                <th>Field</th>
+                <th>Incoming Value</th>
+                <th>Existing Value</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="previewBody"></tbody>
+          </table>
+        </div>
+
+        <!-- Import progress -->
+        <div class="import-progress-wrap" id="importProgressWrap">
+          <div class="import-progress-bar" id="importProgressBar"></div>
+        </div>
+
+        <!-- Import result -->
+        <div class="import-result" id="importResult">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+          <span id="importResultText"></span>
+        </div>
+
+        <div class="step-actions">
+          <button class="btn btn-back" id="backToMapBtn" onclick="goToStep(2)">← Back</button>
+          <button class="btn primary" id="importBtn" onclick="runImport()">
+            Import Data
+          </button>
+        </div>
+      </div>
+
+    </div><!-- /importer-inner -->
+  </div><!-- /importer-body -->
+</div><!-- /app -->
+
+<div id="toast" class="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="config.js"></script>
+<script>
+// ─── SUPABASE ─────────────────────────────────────────────────────────────────
+const { createClient } = supabase;
+const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// ─── CONSTANTS ────────────────────────────────────────────────────────────────
+// Field mapping options shown in the column mapper dropdowns
+const FIELD_OPTIONS = [
+  {value:'ignore',       label:'— Ignore this column —', group:''},
+  {value:'phase',        label:'Phase Identifier',        group:''},
+  {value:'desc',         label:'Overview / Description',  group:'Summary fields'},
+  {value:'humans',       label:'People & Environments',   group:'Summary fields'},
+  {value:'systems',      label:'Systems & Tools',         group:'Summary fields'},
+  {value:'pain',         label:'Pain Points & Friction',  group:'Summary fields'},
+  {value:'works',        label:"What's Working",          group:'Summary fields'},
+  {value:'work',         label:'Workarounds / Activities', group:'Summary fields'},
+  {value:'qs',           label:'Key Questions',            group:'Summary fields'},
+  {value:'desc_detail',    label:'Overview (detail text)',  group:'Detail fields'},
+  {value:'humans_detail',  label:'People & Environments (detail)', group:'Detail fields'},
+  {value:'systems_detail', label:'Systems & Tools (detail)', group:'Detail fields'},
+  {value:'pain_detail',    label:'Pain Points (detail)',    group:'Detail fields'},
+  {value:'works_detail',   label:"What's Working (detail)", group:'Detail fields'},
+  {value:'work_detail',    label:'Workarounds (detail)',    group:'Detail fields'},
+  {value:'qs_detail',      label:'Key Questions (detail)',  group:'Detail fields'},
+  {value:'future_current', label:'Future State — Current',  group:'Future State'},
+  {value:'future_state',   label:'Future State — Proposed', group:'Future State'},
+];
+
+// Human-readable labels for row keys
+const ROW_LABELS = {
+  desc:'Overview', humans:'People', systems:'Systems',
+  pain:'Pain Points', works:"What's Working", work:'Workarounds',
+  qs:'Key Questions', future:'Future State',
+};
+const FIELD_LABELS = {
+  summary:'Summary', detail:'Detail',
+  future_current:'Current State', future_state:'Future State',
+};
+
+// Auto-detect heuristics: lowercase column name fragments → field option value
+const AUTO_DETECT = [
+  {words:['phase','stage'],           value:'phase'},
+  {words:['desc','overview','summ'],  value:'desc'},
+  {words:['people','human','person','role','team','staff'], value:'humans'},
+  {words:['system','tool','platform','software'],           value:'systems'},
+  {words:['pain','friction','blocker','issue','problem'],   value:'pain'},
+  {words:['working','positive','strength','good'],          value:'works'},
+  {words:['workaround','activit','process','step','work'],  value:'work'},
+  {words:['question','q&a','open','uncertainty'],           value:'qs'},
+  {words:['current state','as-is','current'],               value:'future_current'},
+  {words:['future','proposed','to-be','target'],            value:'future_state'},
+];
+
+// ─── STATE ────────────────────────────────────────────────────────────────────
+let parsedRows = [];       // [{col1: val, col2: val, ...}, ...]
+let columns = [];          // [colName, ...]
+let phases = [];           // Supabase phases rows
+let existingCells = {};    // {`${phaseId}_${rowKey}`: cellRow}
+let previewItems = [];     // Computed preview array
+let activeFilter = 'all';  // 'all'|'new'|'overwrite'|'skip'
+
+// ─── AUTH ─────────────────────────────────────────────────────────────────────
+async function initAuth() {
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) { window.location.replace('/login.html'); return; }
+
+  const { data: profile } = await sb
+    .from('profiles').select('role').eq('id', session.user.id).single();
+
+  if (!profile || profile.role !== 'admin') {
+    document.getElementById('authGuard').innerHTML =
+      '<div style="color:var(--red);font-weight:600">Admin access required</div>' +
+      '<a href="/" style="color:var(--accent);font-size:12px;margin-top:8px">← Back to map</a>';
+    return;
+  }
+
+  document.getElementById('authGuard').style.display = 'none';
+  document.getElementById('importerBody').hidden = false;
+  document.getElementById('hdrUser').textContent = session.user.email;
+}
+
+// ─── FILE HANDLING ────────────────────────────────────────────────────────────
+const dropZone = document.getElementById('dropZone');
+const fileInput = document.getElementById('fileInput');
+
+dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+dropZone.addEventListener('drop', e => { e.preventDefault(); dropZone.classList.remove('drag-over'); handleFile(e.dataTransfer.files[0]); });
+document.getElementById('browseBtn').addEventListener('click', () => fileInput.click());
+document.getElementById('changeFileBtn').addEventListener('click', () => { fileInput.click(); });
+fileInput.addEventListener('change', e => handleFile(e.target.files[0]));
+
+function handleFile(file) {
+  if (!file) return;
+  const ext = file.name.split('.').pop().toLowerCase();
+  if (!['xlsx','xls','csv'].includes(ext)) {
+    showToast('Unsupported file type — use .xlsx, .xls, or .csv', 'error');
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const data = new Uint8Array(e.target.result);
+      const wb = XLSX.read(data, { type: 'array' });
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      const rows = XLSX.utils.sheet_to_json(ws, { defval: '' });
+
+      if (!rows.length) { showToast('File is empty or could not be parsed', 'error'); return; }
+
+      parsedRows = rows;
+      columns = Object.keys(rows[0]);
+
+      // Update UI
+      document.getElementById('fileInfoName').textContent = file.name;
+      document.getElementById('fileInfoMeta').textContent =
+        `${rows.length} rows · ${columns.length} columns · Sheet: ${wb.SheetNames[0]}`;
+      document.getElementById('fileInfoBar').style.display = 'flex';
+      document.getElementById('s1Next').disabled = false;
+
+      showToast(`Parsed ${rows.length} rows from ${file.name}`, 'success');
+    } catch(err) {
+      showToast('Failed to parse file: ' + err.message, 'error');
+    }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+// ─── STEPPER ──────────────────────────────────────────────────────────────────
+let currentStep = 1;
+
+function goToStep(step) {
+  if (step === 2) renderColumnMapper();
+  if (step === 3) { if (!computePreview()) return; renderPreviewTable(); }
+
+  // Update panels
+  [1,2,3].forEach(n => {
+    document.getElementById(`s${n}`).classList.toggle('active', n === step);
+    const si = document.getElementById(`si${n}`);
+    si.classList.toggle('active', n === step);
+    si.classList.toggle('done', n < step);
+  });
+  [1,2].forEach(n => {
+    document.getElementById(`sl${n}`).classList.toggle('done', n < step);
+  });
+  currentStep = step;
+}
+
+// ─── COLUMN MAPPER ────────────────────────────────────────────────────────────
+function renderColumnMapper() {
+  const tbody = document.getElementById('mapperBody');
+  tbody.innerHTML = '';
+
+  columns.forEach(col => {
+    // Auto-detect best match
+    const colLow = col.toLowerCase();
+    let autoValue = 'ignore';
+    for (const rule of AUTO_DETECT) {
+      if (rule.words.some(w => colLow.includes(w))) { autoValue = rule.value; break; }
+    }
+
+    // First 3 preview values (non-empty)
+    const previews = parsedRows.slice(0, 5).map(r => String(r[col] || '').trim())
+      .filter(v => v).slice(0, 3);
+    const previewText = previews.length
+      ? previews.map(v => v.length > 35 ? v.slice(0,35)+'…' : v).join(' · ')
+      : '(empty)';
+
+    // Build grouped <select>
+    let optionsHTML = '';
+    let lastGroup = null;
+    FIELD_OPTIONS.forEach(opt => {
+      if (opt.group !== lastGroup) {
+        if (lastGroup !== null) optionsHTML += '</optgroup>';
+        if (opt.group) optionsHTML += `<optgroup label="${opt.group}">`;
+        lastGroup = opt.group;
+      }
+      const sel = opt.value === autoValue ? ' selected' : '';
+      optionsHTML += `<option value="${opt.value}"${sel}>${opt.label}</option>`;
+    });
+    if (lastGroup) optionsHTML += '</optgroup>';
+
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td class="col-name-cell">${escHtml(col)}</td>
+      <td class="col-preview-cell" title="${escHtml(previews.join(' | '))}">${escHtml(previewText)}</td>
+      <td>
+        <select class="col-select${autoValue !== 'ignore' ? ' mapped' : ''}" data-col="${escHtml(col)}">
+          ${optionsHTML}
+        </select>
+      </td>`;
+    tbody.appendChild(tr);
+
+    tr.querySelector('select').addEventListener('change', function() {
+      this.classList.toggle('mapped', this.value !== 'ignore');
+    });
+  });
+}
+
+// ─── LOAD SUPABASE DATA ───────────────────────────────────────────────────────
+async function loadPhases() {
+  if (phases.length) return;
+  const { data, error } = await sb.from('phases').select('*').order('sort_order');
+  if (error || !data) return;
+  phases = data;
+}
+
+async function loadExistingCells() {
+  const { data, error } = await sb.from('cells').select('*');
+  if (error || !data) return;
+  existingCells = {};
+  data.forEach(c => { existingCells[`${c.phase_id}_${c.row_key}`] = c; });
+}
+
+// ─── PREVIEW COMPUTATION ─────────────────────────────────────────────────────
+function computePreview() {
+  // Gather mapping from selects
+  const mapping = {};
+  document.querySelectorAll('.col-select').forEach(sel => {
+    if (sel.value !== 'ignore') mapping[sel.dataset.col] = sel.value;
+  });
+
+  const phaseCol = Object.entries(mapping).find(([,v]) => v === 'phase')?.[0];
+  if (!phaseCol) {
+    showToast('Please set one column as Phase Identifier', 'error');
+    return false;
+  }
+
+  // Async load then render — but we need phases loaded already
+  // We do a synchronous check here; loadExistingCells is called before we render
+  previewItems = [];
+
+  parsedRows.forEach((row, rowIdx) => {
+    const phaseValue = String(row[phaseCol] || '').trim();
+    const phase = matchPhase(phaseValue, rowIdx);
+    if (!phase) return;
+
+    Object.entries(mapping).forEach(([col, fieldKey]) => {
+      if (fieldKey === 'phase') return;
+
+      const value = String(row[col] || '').trim();
+      if (!value) return;
+
+      // Decode fieldKey into {rowKey, field}
+      let rowKey, field;
+      if (fieldKey === 'future_current') { rowKey = 'future'; field = 'future_current'; }
+      else if (fieldKey === 'future_state') { rowKey = 'future'; field = 'future_state'; }
+      else if (fieldKey.endsWith('_detail')) { rowKey = fieldKey.replace('_detail',''); field = 'detail'; }
+      else { rowKey = fieldKey; field = 'summary'; }
+
+      const cellKey = `${phase.id}_${rowKey}`;
+      const existing = existingCells[cellKey];
+      let existingValue = '';
+      if (field === 'summary') existingValue = existing?.summary || '';
+      else if (field === 'detail') existingValue = existing?.detail || '';
+      else if (field === 'future_current') existingValue = existing?.future_current || '';
+      else if (field === 'future_state') existingValue = existing?.future_state || '';
+
+      let status;
+      if (!existingValue) status = 'new';
+      else if (existing?.manually_edited) status = 'skip';
+      else status = 'overwrite';
+
+      previewItems.push({ phase, rowKey, field, value, existingValue, status, col, lastEditedAt: existing?.last_edited_at });
+    });
+  });
+
+  return true;
+}
+
+function matchPhase(value, rowIdx) {
+  const v = value.toLowerCase().trim();
+  if (!v) return phases[rowIdx] || null;
+  // Exact short_id
+  let m = phases.find(p => p.short_id.toLowerCase() === v);
+  if (m) return m;
+  // Exact name
+  m = phases.find(p => p.name.toLowerCase() === v);
+  if (m) return m;
+  // Contains name
+  m = phases.find(p => v.includes(p.name.toLowerCase()) || p.name.toLowerCase().includes(v));
+  if (m) return m;
+  // Numeric (1→P1)
+  const num = parseInt(v.replace(/\D/g,''));
+  if (!isNaN(num)) { m = phases.find(p => p.id === num || p.sort_order === num); if (m) return m; }
+  // Fallback: row index
+  return phases[rowIdx] || null;
+}
+
+// ─── PREVIEW RENDER ───────────────────────────────────────────────────────────
+function renderPreviewTable() {
+  const forceOverwrite = document.getElementById('forceOverwrite').checked;
+
+  const counts = { all: previewItems.length, new: 0, overwrite: 0, skip: 0 };
+  previewItems.forEach(item => {
+    if (item.status === 'new') counts.new++;
+    else if (item.status === 'overwrite') counts.overwrite++;
+    else counts.skip++;
+  });
+
+  // Stats bar
+  const statsEl = document.getElementById('previewStats');
+  statsEl.innerHTML = `
+    <div class="stat-chip all${activeFilter==='all'?' active':''}" onclick="setFilter('all')">
+      All changes <span class="count">${counts.all}</span>
+    </div>
+    <div class="stat-chip new-chip${activeFilter==='new'?' active':''}" onclick="setFilter('new')">
+      🟢 New <span class="count">${counts.new}</span>
+    </div>
+    <div class="stat-chip overwrite-chip${activeFilter==='overwrite'?' active':''}" onclick="setFilter('overwrite')">
+      🟡 Will overwrite <span class="count">${counts.overwrite}</span>
+    </div>
+    <div class="stat-chip skip-chip${activeFilter==='skip'?' active':''}" onclick="setFilter('skip')">
+      🔒 Skipped <span class="count">${counts.skip}</span>
+    </div>`;
+
+  // Filter
+  const visible = previewItems.filter(item => {
+    if (activeFilter === 'all') return true;
+    return item.status === activeFilter;
+  });
+
+  // Table body
+  const tbody = document.getElementById('previewBody');
+  if (!visible.length) {
+    tbody.innerHTML = `<tr><td colspan="6" class="no-results">No items match this filter</td></tr>`;
+  } else {
+    tbody.innerHTML = visible.map(item => {
+      const effectiveStatus = (item.status === 'skip' && forceOverwrite) ? 'force' : item.status;
+      const statusLabel = { new:'🟢 New', overwrite:'🟡 Will overwrite', skip:'🔒 Skipped', force:'⚡ Force write' };
+      const statusClass = effectiveStatus;
+      const truncate = (s, n=55) => s.length > n ? s.slice(0,n)+'…' : s;
+      const editedNote = item.lastEditedAt
+        ? ` title="Manually edited ${new Date(item.lastEditedAt).toLocaleDateString()}"` : '';
+      return `<tr>
+        <td>
+          <span class="phase-dot" style="background:${escHtml(item.phase.color_bg)}"></span>
+          <span style="font-size:11px;font-weight:600">${escHtml(item.phase.short_id)}</span>
+          <span style="font-size:11px;color:var(--muted);margin-left:4px">${escHtml(item.phase.name)}</span>
+        </td>
+        <td><span class="row-type-badge">${escHtml(ROW_LABELS[item.rowKey]||item.rowKey)}</span></td>
+        <td style="font-size:10.5px;color:var(--muted);font-family:'JetBrains Mono',monospace">${escHtml(FIELD_LABELS[item.field]||item.field)}</td>
+        <td class="value-cell" title="${escHtml(item.value)}">${escHtml(truncate(item.value))}</td>
+        <td class="existing-cell"${editedNote}>${item.existingValue ? escHtml(truncate(item.existingValue, 40)) : '<span style="color:var(--border-strong)">—</span>'}</td>
+        <td><span class="status-badge ${statusClass}">${statusLabel[effectiveStatus]}</span></td>
+      </tr>`;
+    }).join('');
+  }
+
+  // Update import button
+  const importable = previewItems.filter(i =>
+    i.status === 'new' || i.status === 'overwrite' || (forceOverwrite && i.status === 'skip')
+  ).length;
+  const importBtn = document.getElementById('importBtn');
+  importBtn.textContent = importable > 0 ? `Import ${importable} cells` : 'Nothing to import';
+  importBtn.disabled = importable === 0;
+}
+
+function setFilter(f) {
+  activeFilter = f;
+  renderPreviewTable();
+}
+
+// ─── IMPORT ───────────────────────────────────────────────────────────────────
+async function runImport() {
+  const forceOverwrite = document.getElementById('forceOverwrite').checked;
+
+  const toImport = previewItems.filter(item =>
+    item.status === 'new' || item.status === 'overwrite' || (forceOverwrite && item.status === 'skip')
+  );
+
+  if (!toImport.length) { showToast('Nothing to import', 'error'); return; }
+
+  const importBtn = document.getElementById('importBtn');
+  const backBtn = document.getElementById('backToMapBtn');
+  const progressWrap = document.getElementById('importProgressWrap');
+  const progressBar = document.getElementById('importProgressBar');
+  const resultEl = document.getElementById('importResult');
+
+  importBtn.disabled = true;
+  importBtn.textContent = 'Importing…';
+  backBtn.disabled = true;
+  progressWrap.style.display = 'block';
+  resultEl.style.display = 'none';
+
+  let done = 0, errors = 0;
+
+  // Group items by (phase_id, row_key) to merge future_current + future_state in one upsert
+  const groups = {};
+  toImport.forEach(item => {
+    const key = `${item.phase.id}_${item.rowKey}`;
+    if (!groups[key]) groups[key] = { phase_id: item.phase.id, row_key: item.rowKey };
+    groups[key][item.field] = item.value;
+    // Clear manually_edited flag on non-force imports
+    if (!forceOverwrite || item.status !== 'skip') groups[key].manually_edited = false;
+  });
+
+  const groupArr = Object.values(groups);
+
+  for (const record of groupArr) {
+    const { error } = await sb.from('cells').upsert(record, { onConflict: 'phase_id,row_key' });
+    if (error) errors++;
+    else done++;
+    const pct = Math.round(((done + errors) / groupArr.length) * 100);
+    progressBar.style.width = pct + '%';
+  }
+
+  // Refresh existing cells for updated statuses
+  await loadExistingCells();
+  computePreview();
+  renderPreviewTable();
+
+  importBtn.disabled = false;
+  importBtn.textContent = 'Import Again';
+  backBtn.disabled = false;
+
+  const resultText = errors
+    ? `Imported ${done} cells with ${errors} errors`
+    : `✓ Successfully imported ${done} cells`;
+  document.getElementById('importResultText').textContent = resultText;
+  resultEl.style.display = 'flex';
+
+  showToast(errors ? `Imported with ${errors} errors` : `✓ ${done} cells imported`, errors ? 'error' : 'success');
+}
+
+// ─── ASYNC PREVIEW TRIGGER ────────────────────────────────────────────────────
+// Override goToStep(3) to load Supabase data first
+const _origGoToStep = goToStep;
+async function computeAndShowPreview() {
+  const s2btn = document.getElementById('s2Next');
+  s2btn.disabled = true;
+  s2btn.innerHTML = '<span class="loading-inline"><span class="spin-sm"></span> Loading…</span>';
+
+  try {
+    await loadPhases();
+    await loadExistingCells();
+    goToStep(3);
+  } finally {
+    s2btn.disabled = false;
+    s2btn.textContent = 'Next: Preview →';
+  }
+}
+
+// ─── UTILITIES ────────────────────────────────────────────────────────────────
+function escHtml(str) {
+  return String(str)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+let toastTimer;
+function showToast(msg, type='') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast' + (type ? ' ' + type : '') + ' show';
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 3200);
+}
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+initAuth();
+</script>
+</body>
+</html>

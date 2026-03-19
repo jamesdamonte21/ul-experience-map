@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — UL Experience Map</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#07080D;--surface:#0E1018;--surface-2:#141720;--surface-3:#1A1E2C;
+  --border:rgba(255,255,255,.07);--border-strong:rgba(255,255,255,.13);
+  --text:#E8EEFF;--text2:#98AECA;--muted:#526075;
+  --accent:#7B5CFF;--accent-light:rgba(123,92,255,.15);
+  --green:#00D47E;--red:#FF4C4C;--amber:#F5A522;
+  --radius:9px;--ease:170ms cubic-bezier(.4,0,.2,1);
+}
+html,body{height:100%;font-family:'Sora',-apple-system,sans-serif;background:var(--bg);color:var(--text);font-size:13px;-webkit-font-smoothing:antialiased}
+
+/* ── LAYOUT ── */
+.app{display:flex;flex-direction:column;height:100%}
+.app-header{flex-shrink:0;height:56px;background:rgba(7,8,13,.95);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;gap:14px;backdrop-filter:blur(12px)}
+.hdr-logo{height:26px;flex-shrink:0}
+.hdr-logo svg{height:100%;width:auto}
+.hdr-title{font-size:13px;font-weight:700;color:#DDE5FF;letter-spacing:-.2px}
+.hdr-badge{padding:2px 9px;background:rgba(255,70,70,.15);color:#FF8080;border-radius:20px;font-size:10px;font-weight:700;border:1px solid rgba(255,70,70,.25);font-family:'JetBrains Mono',monospace}
+.hdr-spacer{flex:1}
+.hdr-user{font-size:11px;color:var(--muted);font-family:'JetBrains Mono',monospace}
+.hdr-btn{padding:6px 14px;border-radius:7px;font-size:11.5px;font-weight:600;font-family:inherit;cursor:pointer;transition:all var(--ease);border:1px solid var(--border);background:var(--surface-2);color:var(--text2)}
+.hdr-btn:hover{border-color:var(--border-strong);color:var(--text)}
+.hdr-btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.hdr-btn.primary:hover{background:#6B4FE8}
+
+.body{display:flex;flex:1;overflow:hidden}
+
+/* ── SIDEBAR ── */
+.sidebar{width:220px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
+.sidebar-section{padding:10px 12px 6px;font-size:8.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;font-family:'JetBrains Mono',monospace}
+.nav-item{display:flex;align-items:center;gap:10px;padding:8px 12px 8px 14px;font-size:12px;font-weight:500;color:var(--text2);cursor:pointer;transition:all var(--ease);border-left:2px solid transparent;user-select:none}
+.nav-item:hover{color:var(--text);background:rgba(255,255,255,.04)}
+.nav-item.active{color:var(--text);border-left-color:var(--accent);background:rgba(123,92,255,.08)}
+.nav-item-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.nav-item-label{flex:1}
+.nav-item-count{font-size:9px;font-family:'JetBrains Mono',monospace;color:var(--muted);padding:1px 5px;background:rgba(255,255,255,.06);border-radius:4px}
+.sidebar-divider{height:1px;background:var(--border);margin:6px 0}
+
+/* ── MAIN EDITOR ── */
+.editor{flex:1;overflow-y:auto;padding:28px 32px}
+.editor::-webkit-scrollbar{width:6px}
+.editor::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:3px}
+
+.editor-header{margin-bottom:24px}
+.editor-title{font-size:18px;font-weight:700;letter-spacing:-.3px;color:var(--text)}
+.editor-sub{font-size:12px;color:var(--muted);margin-top:4px}
+
+/* ── FIELD GROUPS ── */
+.field-group{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:14px;overflow:hidden;transition:border-color var(--ease)}
+.field-group:focus-within{border-color:rgba(123,92,255,.4)}
+.field-group-header{display:flex;align-items:center;gap:10px;padding:12px 14px 10px;border-bottom:1px solid var(--border)}
+.field-icon{width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;border:1px solid var(--border-strong)}
+.field-icon svg{width:12px;height:12px}
+.field-group-name{font-size:11.5px;font-weight:700;color:var(--text);flex:1}
+.field-group-hint{font-size:10px;color:var(--muted)}
+.save-indicator{font-size:9px;font-family:'JetBrains Mono',monospace;padding:2px 7px;border-radius:4px;transition:all .3s}
+.save-indicator.saved{background:rgba(0,212,126,.15);color:var(--green)}
+.save-indicator.saving{background:rgba(245,165,34,.12);color:var(--amber)}
+.save-indicator.error{background:rgba(255,76,76,.12);color:var(--red)}
+.field-body{padding:12px 14px;display:flex;flex-direction:column;gap:10px}
+.field-label{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin-bottom:5px;font-family:'JetBrains Mono',monospace}
+.field-textarea{width:100%;background:var(--surface-2);border:1px solid var(--border);border-radius:7px;padding:10px 12px;font-size:12px;font-family:'Sora',sans-serif;color:var(--text);resize:vertical;min-height:72px;outline:none;line-height:1.65;transition:border-color var(--ease)}
+.field-textarea:focus{border-color:rgba(123,92,255,.5);background:var(--surface-3)}
+.field-textarea::placeholder{color:var(--muted)}
+.char-count{font-size:9px;color:var(--muted);text-align:right;font-family:'JetBrains Mono',monospace;margin-top:2px}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.manually-edited-badge{display:inline-flex;align-items:center;gap:4px;font-size:9px;padding:2px 7px;background:rgba(123,92,255,.12);color:#A898FF;border-radius:4px;font-family:'JetBrains Mono',monospace;border:1px solid rgba(123,92,255,.2)}
+
+/* ── HEATMAP EDITOR ── */
+.heat-grid{display:grid;overflow-x:auto}
+.heat-table{border-collapse:collapse;min-width:100%}
+.heat-table th{padding:8px 10px;font-size:8.5px;font-weight:700;text-align:center;border-bottom:1px solid var(--border);color:var(--text2);font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.5px;white-space:nowrap}
+.heat-table th.dim-th{text-align:left;font-size:11.5px;font-weight:600;text-transform:none;letter-spacing:0;font-family:'Sora',sans-serif;color:var(--text);min-width:180px}
+.heat-table td{padding:4px 6px;border-bottom:1px solid var(--border);text-align:center}
+.heat-table td.dim-td{text-align:left;padding:8px 10px;font-size:12px;color:var(--text2)}
+.heat-select{width:50px;padding:4px 2px;background:var(--surface-2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:12px;font-family:'JetBrains Mono',monospace;font-weight:700;text-align:center;cursor:pointer;outline:none;transition:all var(--ease)}
+.heat-select:focus{border-color:rgba(123,92,255,.5)}
+
+/* ── SYSTEMS EDITOR ── */
+.systems-editor{display:flex;flex-direction:column;gap:20px}
+.cluster-block{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.cluster-block-hdr{display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid var(--border)}
+.cluster-color-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.cluster-block-name{font-size:12.5px;font-weight:700;flex:1}
+.system-row-edit{display:flex;align-items:center;gap:12px;padding:8px 14px;border-bottom:1px solid var(--border)}
+.system-row-edit:last-child{border-bottom:none}
+.system-name-input{flex:1;background:transparent;border:none;color:var(--text2);font-size:12px;font-family:'Sora',sans-serif;outline:none}
+.system-name-input:focus{color:var(--text)}
+.phase-checkboxes{display:flex;gap:4px}
+.phase-cb-wrap{display:flex;align-items:center;gap:2px}
+.phase-cb{width:18px;height:18px;border-radius:4px;cursor:pointer;accent-color:var(--accent)}
+.phase-cb-label{font-size:8.5px;font-weight:700;font-family:'JetBrains Mono',monospace;color:var(--muted)}
+
+/* ── PHASES EDITOR ── */
+.phases-editor{display:flex;flex-direction:column;gap:12px}
+.phase-edit-row{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;display:flex;align-items:center;gap:14px}
+.phase-num{font-size:10px;font-weight:700;font-family:'JetBrains Mono',monospace;color:var(--muted);width:24px;flex-shrink:0}
+.phase-color-swatch{width:30px;height:30px;border-radius:6px;border:2px solid var(--border-strong);cursor:pointer;flex-shrink:0}
+.phase-name-input{flex:1;background:var(--surface-2);border:1px solid var(--border);border-radius:7px;padding:7px 10px;font-size:12.5px;font-weight:600;font-family:'Sora',sans-serif;color:var(--text);outline:none;transition:border-color var(--ease)}
+.phase-name-input:focus{border-color:rgba(123,92,255,.5)}
+.phase-short-id{font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--muted);width:30px;flex-shrink:0;text-align:center}
+
+/* ── LOADING / EMPTY ── */
+.loading-state{display:flex;flex-direction:column;align-items:center;justify-content:center;height:300px;gap:14px;color:var(--muted)}
+.spin{width:28px;height:28px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--surface-2);color:var(--text);padding:9px 18px;border-radius:8px;font-size:12px;font-weight:600;box-shadow:0 6px 24px rgba(0,0,0,.5);transition:transform .28s cubic-bezier(.4,0,.2,1);z-index:999;border:1px solid var(--border-strong);white-space:nowrap}
+.toast.show{transform:translateX(-50%) translateY(0)}
+
+/* ── USERS PANEL ── */
+.users-table{width:100%;border-collapse:collapse;background:var(--surface);border-radius:var(--radius);overflow:hidden;border:1px solid var(--border)}
+.users-table th{padding:10px 14px;font-size:9px;font-weight:700;text-align:left;border-bottom:1px solid var(--border);color:var(--text2);text-transform:uppercase;letter-spacing:.6px;font-family:'JetBrains Mono',monospace}
+.users-table td{padding:10px 14px;border-bottom:1px solid var(--border);font-size:12px}
+.users-table tr:last-child td{border-bottom:none}
+.role-select{background:var(--surface-2);border:1px solid var(--border);border-radius:6px;padding:4px 8px;font-size:11px;color:var(--text);font-family:inherit;cursor:pointer;outline:none}
+.role-badge{display:inline-flex;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700;font-family:'JetBrains Mono',monospace}
+.role-badge.admin{background:rgba(123,92,255,.15);color:#A898FF;border:1px solid rgba(123,92,255,.25)}
+.role-badge.viewer{background:rgba(255,255,255,.06);color:var(--text2);border:1px solid var(--border-strong)}
+
+/* ── ENABLERS EDITOR ── */
+.enabler-row{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;margin-bottom:10px}
+.enabler-phase-badge{padding:3px 9px;border-radius:5px;font-size:10px;font-weight:800;font-family:'JetBrains Mono',monospace;flex-shrink:0;white-space:nowrap}
+.enabler-input{flex:1;background:var(--surface-2);border:1px solid var(--border);border-radius:7px;padding:8px 12px;font-size:12px;font-family:'Sora',sans-serif;color:var(--text);outline:none;transition:border-color var(--ease)}
+.enabler-input:focus{border-color:rgba(123,92,255,.5)}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <!-- HEADER -->
+  <header class="app-header">
+    <div class="hdr-logo">
+      <svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 486.8 200"><defs><linearGradient id="ag1" gradientUnits="userSpaceOnUse" x1="-366.82" y1="202.18" x2="-559.98" y2="202.18" gradientTransform="matrix(-1 0 0 -1 -340.89 316.68)"><stop offset="0" style="stop-color:#CA0123"/><stop offset=".97" style="stop-color:#5B0428"/></linearGradient><linearGradient id="ag2" gradientUnits="userSpaceOnUse" x1="157.86" y1="248.24" x2="16.13" y2="367.16" gradientTransform="matrix(1 0 0 1 0 -196)"><stop offset="0" style="stop-color:#CA0123"/><stop offset=".97" style="stop-color:#5B0428"/></linearGradient></defs><path fill="url(#ag1)" d="M95.5,175c43.5,0,74.5-35,74.5-75s-31.5-70-70-70c-4,0-9,0.5-11.5,1c4.5-1.5,12-2,16-2c51,0,81.5,41,81.5,85c0,51.5-38.5,86-86,86C45,200,0,155,0,100c0-19.5,6-45,26.5-67.5c-13,18-16.5,36-16.5,54C10,133,41.5,175,95.5,175z"/><path fill="url(#ag2)" d="M104.5,25C61,25,30,60,30,100s31.5,70,70,70c4,0,9-0.5,11.5-1c-4.5,1.5-12,2-16,2c-51,0-81.5-41-81.5-85c0-51.5,38.5-86,86-86c55,0,100,45,100,100c0,19.5-6,45-26.5,67.5c13-18,16.5-36,16.5-54C190,67,158.5,25,104.5,25z"/><path fill="#CA0123" d="M245.1,124.8c-10,0-15.5-6-16-15.5h9.5c0,5,2.5,7.5,6,7.5c2.5,0,5-1,5-4.5s-2.5-5.5-7-8l-3.5-2c-5-2.5-9-6-9-13c0-9,6.5-13.5,15-13.5c9,0,14.5,5.5,14.5,14.5h-9.5c-0.5-5-2-7.5-5.5-7.5c-3,0-4.5,2-4.5,4.5c0,3.5,3,5.5,6.5,7.5l3,2c3.5,2,10,5.5,10,14.5C260.1,120.8,252.6,124.8,245.1,124.8z M279.1,124.3c8.5,0,15.5-6,15.5-18s-7-18-15.5-18s-15.5,6.5-15.5,18C263.6,118.4,270.6,124.8,279.1,124.3z M279.1,116.4c-3.5,0-6-3.5-6-10s2.5-10,6-10s6,3.5,6,10S283.1,116.4,279.1,116.4z M299.6,124.3h9.5V74.9h-9.5V124.3z M344,123.8v-34h-9.5v21c0,4-2,6-5,6s-5-2-5-6V89.3H315v23.5c0,7.5,4,12,10.5,12c4.5,0,7-2,8.5-4.5h0.5l1,3.5H344z M382.5,84.9c3,0,5.5-2.5,5.5-5.5s-2.5-5.5-5.5-5.5c-3.5,0-6,2.5-6,5.5S379.5,84.9,382.5,84.9z M377.5,123.8h9.5V89.3h-9.5V123.8z M407.9,124.3c8.5,0,15.5-6,15.5-18s-7-18-15.5-18s-15.5,6.5-15.5,18C392.4,118.4,399.4,124.3,407.9,124.3z M407.9,116.4c-3.5,0-6-3.5-6-10s2.5-10,6-10s6,3.5,6,10S411.4,116.4,407.9,116.4z M474.3,123.8c6.5,0,12.5-3,12.5-10s-5-9.5-9.5-11l-2.5-1c-2.5-1-4.5-2-4.5-4s1-3,3-3c2.5,0,4,1.5,4,4h9c0-6-4.5-10.5-12.5-10.5c-7,0-12.5,3.5-12.5,10.5c0,6.5,5,8.5,9,10l2.5,1c3,1,5,2,5,4.5c0,2-1.5,3-3.5,3c-2.5,0-4-1-4.5-4.5h-9C461.4,120.3,465.8,124.3,474.3,123.8z M364.5,124.3c2,0,4.5,0,6-0.5v-7c-1,0.5-2,0.5-3,0.5c-3,0-4-2-4-4V96.8h8.5v-7.5h-8.5v-9H355v4c0,3.5-1.5,5-5,5h-1.5v7.5h6v18C354.5,120.3,357.5,124.8,364.5,124.3z M427.9,89.4v34.5h9.5v-21c0-4.5,2-6.5,5-6.5s5,2,5,6v21.5h9.5v-23.5c0-7.5-4-12-10.5-12c-4.5,0-7,2-8.5,4.5h-0.5l-1-3.5H427.9z M56.6,52.5v50.1c0,14.2,8,20.8,21.8,20.8c16.6,0,21.8-9,21.8-20.8V52.5H84v51.8c0,2.9-1.3,6.6-5.5,6.6c-4.6,0-5.6-2.9-5.6-6.2V52.5H56.6 M106.6,146.8V77.5h16.2v55.4h19.8v13.9L106.6,146.8"/></svg>
+    </div>
+    <div class="hdr-title">Experience Map Admin</div>
+    <div class="hdr-badge">ADMIN</div>
+    <div class="hdr-spacer"></div>
+    <span class="hdr-user" id="hdrUser"></span>
+    <a href="/" class="hdr-btn">← View Map</a>
+    <button class="hdr-btn" id="signOutBtn">Sign out</button>
+  </header>
+
+  <div class="body">
+    <!-- SIDEBAR -->
+    <nav class="sidebar">
+      <div class="sidebar-section">Content</div>
+      <div class="nav-item active" data-section="cells" data-phase="1">
+        <div class="nav-item-dot" style="background:#6B4FFF"></div>
+        <span class="nav-item-label">P1 · Intake & Scoping</span>
+      </div>
+      <div class="nav-item" data-section="cells" data-phase="2">
+        <div class="nav-item-dot" style="background:#00B87C"></div>
+        <span class="nav-item-label">P2 · Project Setup</span>
+      </div>
+      <div class="nav-item" data-section="cells" data-phase="3">
+        <div class="nav-item-dot" style="background:#2B80FF"></div>
+        <span class="nav-item-label">P3 · Evaluation</span>
+      </div>
+      <div class="nav-item" data-section="cells" data-phase="4">
+        <div class="nav-item-dot" style="background:#E09020"></div>
+        <span class="nav-item-label">P4 · Testing</span>
+      </div>
+      <div class="nav-item" data-section="cells" data-phase="5">
+        <div class="nav-item-dot" style="background:#E03030"></div>
+        <span class="nav-item-label">P5 · Reporting & Cert</span>
+      </div>
+      <div class="nav-item" data-section="cells" data-phase="6">
+        <div class="nav-item-dot" style="background:#C040B8"></div>
+        <span class="nav-item-label">P6 · Surveillance</span>
+      </div>
+      <div class="nav-item" data-section="cells" data-phase="7">
+        <div class="nav-item-dot" style="background:#00A898"></div>
+        <span class="nav-item-label">P7 · Closure</span>
+      </div>
+      <div class="sidebar-divider"></div>
+      <div class="sidebar-section">Settings</div>
+      <div class="nav-item" data-section="heatmap">
+        <div class="nav-item-dot" style="background:#FF4C4C"></div>
+        <span class="nav-item-label">Pain Heatmap</span>
+      </div>
+      <div class="nav-item" data-section="systems">
+        <div class="nav-item-dot" style="background:#7B5CFF"></div>
+        <span class="nav-item-label">Systems</span>
+      </div>
+      <div class="nav-item" data-section="enablers">
+        <div class="nav-item-dot" style="background:#00D47E"></div>
+        <span class="nav-item-label">Key Enablers</span>
+      </div>
+      <div class="nav-item" data-section="phases">
+        <div class="nav-item-dot" style="background:#F5A522"></div>
+        <span class="nav-item-label">Phases</span>
+      </div>
+      <div class="nav-item" data-section="users">
+        <div class="nav-item-dot" style="background:#98AECA"></div>
+        <span class="nav-item-label">Team & Access</span>
+      </div>
+    </nav>
+
+    <!-- EDITOR -->
+    <main class="editor" id="editor">
+      <div class="loading-state"><div class="spin"></div><div>Loading…</div></div>
+    </main>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script>
+const { createClient } = supabase;
+const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// ─── CONSTANTS ────────────────────────────────────────────────────────────────
+const PHASES = [
+  {id:1,short_id:'P1',name:'Intake & Scoping',   color_bg:'#6B4FFF',color_text:'#fff'},
+  {id:2,short_id:'P2',name:'Project Setup',      color_bg:'#00B87C',color_text:'#fff'},
+  {id:3,short_id:'P3',name:'Evaluation',         color_bg:'#2B80FF',color_text:'#fff'},
+  {id:4,short_id:'P4',name:'Testing',            color_bg:'#E09020',color_text:'#fff'},
+  {id:5,short_id:'P5',name:'Reporting & Cert',   color_bg:'#E03030',color_text:'#fff'},
+  {id:6,short_id:'P6',name:'Surveillance',       color_bg:'#C040B8',color_text:'#fff'},
+  {id:7,short_id:'P7',name:'Closure',            color_bg:'#00A898',color_text:'#fff'},
+];
+
+const ROW_DEFS = [
+  {key:'desc',   name:'Overview',       hint:'Phase description & flow', icon:'📋'},
+  {key:'humans', name:'People Involved',hint:'Roles & teams', icon:'👥'},
+  {key:'systems',name:'Systems Used',   hint:'Tools & platforms', icon:'🖥️'},
+  {key:'pain',   name:'Pain Points',    hint:'Friction & blockers', icon:'⚡'},
+  {key:'works',  name:"What's Working", hint:'Positive signals', icon:'✅'},
+  {key:'work',   name:'Workarounds',    hint:'Compensating behaviours', icon:'🔧'},
+  {key:'qs',     name:'Key Questions',  hint:'Open uncertainties', icon:'❓'},
+  {key:'future', name:'Future State',   hint:'Current → target', icon:'🚀', isFuture:true},
+];
+
+const HEAT_DIMS = [
+  {id:1,label:'System fragmentation'},{id:2,label:'Manual data re-entry'},
+  {id:3,label:'Template variance'},{id:4,label:'FU/NCR tracking'},
+  {id:5,label:'Scheduling gaps'},{id:6,label:'Billing & closure'},
+  {id:7,label:'Peer review bottlenecks'},{id:8,label:'Cross-team comms'},
+];
+
+const CLUSTERS = [
+  {id:1,name:'Core Workflow',dot_color:'#6B4FFF'},
+  {id:2,name:'Engineering & Standards',dot_color:'#2B80FF'},
+  {id:3,name:'Lab & Testing',dot_color:'#E09020'},
+  {id:4,name:'Certification',dot_color:'#E03030'},
+  {id:5,name:'Reporting & Analytics',dot_color:'#00A898'},
+];
+
+// ─── STATE ────────────────────────────────────────────────────────────────────
+let currentUser = null;
+let currentSection = 'cells';
+let currentPhase = 1;
+let saveTimers = {};
+let cachedData = { cells:{}, heatScores:{}, systems:[], enablers:{} };
+
+// ─── AUTH ─────────────────────────────────────────────────────────────────────
+async function initAuth() {
+  const { data:{ session } } = await sb.auth.getSession();
+  if (!session) { window.location.replace('/login.html'); return; }
+  currentUser = session.user;
+
+  // Check admin role
+  const { data: profile } = await sb.from('profiles').select('role,full_name').eq('id', currentUser.id).single();
+  if (!profile || profile.role !== 'admin') {
+    document.getElementById('editor').innerHTML = `
+      <div class="loading-state">
+        <div style="font-size:32px">🔒</div>
+        <div style="font-size:14px;color:var(--text)">Access denied</div>
+        <div>Your account doesn't have admin privileges.</div>
+        <a href="/" class="hdr-btn" style="margin-top:8px">← Back to map</a>
+      </div>`;
+    return;
+  }
+
+  document.getElementById('hdrUser').textContent = profile.full_name || currentUser.email;
+  setupNav();
+  loadSection('cells', 1);
+}
+
+// ─── NAVIGATION ───────────────────────────────────────────────────────────────
+function setupNav() {
+  document.querySelectorAll('.nav-item').forEach(el => {
+    el.addEventListener('click', () => {
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      el.classList.add('active');
+      const section = el.dataset.section;
+      const phase = parseInt(el.dataset.phase) || 1;
+      loadSection(section, phase);
+    });
+  });
+}
+
+function loadSection(section, phase) {
+  currentSection = section;
+  currentPhase = phase;
+  const editor = document.getElementById('editor');
+  editor.innerHTML = '<div class="loading-state"><div class="spin"></div><div>Loading…</div></div>';
+
+  if (section === 'cells') renderCells(phase);
+  else if (section === 'heatmap') renderHeatmap();
+  else if (section === 'systems') renderSystems();
+  else if (section === 'enablers') renderEnablers();
+  else if (section === 'phases') renderPhases();
+  else if (section === 'users') renderUsers();
+}
+
+// ─── SUPABASE HELPERS ─────────────────────────────────────────────────────────
+async function sbGet(table, query='') {
+  const { data, error } = await sb.from(table).select(query || '*');
+  if (error) throw error;
+  return data;
+}
+
+function showToast(msg, type='ok') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.borderColor = type === 'error' ? 'rgba(255,76,76,.3)' : 'var(--border-strong)';
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2600);
+}
+
+function setSaveState(id, state, msg='') {
+  const el = document.getElementById(`save-${id}`);
+  if (!el) return;
+  el.className = `save-indicator ${state}`;
+  el.textContent = state === 'saved' ? '✓ Saved' : state === 'saving' ? 'Saving…' : `✗ ${msg}`;
+}
+
+// ─── CELLS EDITOR ─────────────────────────────────────────────────────────────
+async function renderCells(phaseId) {
+  const phase = PHASES.find(p => p.id === phaseId);
+  const { data: cells } = await sb.from('cells').select('*').eq('phase_id', phaseId);
+  const cellMap = {};
+  (cells||[]).forEach(c => { cellMap[c.row_key] = c; });
+
+  let html = `
+    <div class="editor-header">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="padding:4px 12px;border-radius:6px;background:${phase.color_bg};color:${phase.color_text};font-size:11px;font-weight:800;font-family:'JetBrains Mono',monospace">${phase.short_id}</div>
+        <div class="editor-title">${phase.name}</div>
+      </div>
+      <div class="editor-sub">Edit all content rows for this phase. Changes save automatically.</div>
+    </div>`;
+
+  ROW_DEFS.forEach(row => {
+    const cell = cellMap[row.key] || {};
+    const isEdited = cell.manually_edited;
+    const rowId = `${phaseId}_${row.key}`;
+
+    if (row.isFuture) {
+      html += `
+        <div class="field-group" id="fg-${rowId}">
+          <div class="field-group-header">
+            <div class="field-icon" style="background:rgba(123,92,255,.12);color:#A898FF;border-color:rgba(123,92,255,.25)">${row.icon}</div>
+            <div>
+              <div class="field-group-name">${row.name}</div>
+              <div class="field-group-hint">${row.hint}</div>
+            </div>
+            ${isEdited ? '<span class="manually-edited-badge">✎ Manually edited</span>' : ''}
+            <span class="save-indicator" id="save-${rowId}"></span>
+          </div>
+          <div class="field-body">
+            <div class="field-row">
+              <div>
+                <div class="field-label">Current State</div>
+                <textarea class="field-textarea" id="fc-${rowId}" placeholder="Describe the current pain or limitation…" oninput="scheduleSave('${rowId}','${phaseId}','${row.key}')">${esc(cell.future_current||'')}</textarea>
+              </div>
+              <div>
+                <div class="field-label">Future State</div>
+                <textarea class="field-textarea" id="fs-${rowId}" placeholder="Describe the target future state…" oninput="scheduleSave('${rowId}','${phaseId}','${row.key}')">${esc(cell.future_state||'')}</textarea>
+              </div>
+            </div>
+            <div>
+              <div class="field-label">Detail (shown in panel)</div>
+              <textarea class="field-textarea" id="fd-${rowId}" placeholder="Optional longer detail…" style="min-height:56px" oninput="scheduleSave('${rowId}','${phaseId}','${row.key}')">${esc(cell.detail||'')}</textarea>
+            </div>
+          </div>
+        </div>`;
+    } else {
+      html += `
+        <div class="field-group" id="fg-${rowId}">
+          <div class="field-group-header">
+            <div class="field-icon">${row.icon}</div>
+            <div>
+              <div class="field-group-name">${row.name}</div>
+              <div class="field-group-hint">${row.hint}</div>
+            </div>
+            ${isEdited ? '<span class="manually-edited-badge">✎ Manually edited</span>' : ''}
+            <span class="save-indicator" id="save-${rowId}"></span>
+          </div>
+          <div class="field-body">
+            <div>
+              <div class="field-label">Summary <span style="font-weight:400;text-transform:none;letter-spacing:0">(shown in the map grid)</span></div>
+              <textarea class="field-textarea" id="sm-${rowId}" placeholder="Short summary shown in the map grid cell…" oninput="scheduleSave('${rowId}','${phaseId}','${row.key}');updateCharCount('sm-${rowId}','cc-${rowId}')">${esc(cell.summary||'')}</textarea>
+              <div class="char-count" id="cc-${rowId}">${(cell.summary||'').length} chars</div>
+            </div>
+            <div>
+              <div class="field-label">Detail <span style="font-weight:400;text-transform:none;letter-spacing:0">(shown in slide-in panel)</span></div>
+              <textarea class="field-textarea" id="dt-${rowId}" placeholder="Full detail shown when the cell is clicked…" style="min-height:100px" oninput="scheduleSave('${rowId}','${phaseId}','${row.key}')">${esc(cell.detail||'')}</textarea>
+            </div>
+          </div>
+        </div>`;
+    }
+  });
+
+  document.getElementById('editor').innerHTML = html;
+}
+
+function updateCharCount(inputId, countId) {
+  const el = document.getElementById(inputId);
+  const cc = document.getElementById(countId);
+  if (el && cc) cc.textContent = `${el.value.length} chars`;
+}
+
+function scheduleSave(rowId, phaseId, rowKey) {
+  setSaveState(rowId, 'saving');
+  clearTimeout(saveTimers[rowId]);
+  saveTimers[rowId] = setTimeout(() => saveCell(rowId, phaseId, rowKey), 1200);
+}
+
+async function saveCell(rowId, phaseId, rowKey) {
+  const row = ROW_DEFS.find(r => r.key === rowKey);
+  let payload = {
+    phase_id: parseInt(phaseId),
+    row_key: rowKey,
+    manually_edited: true,
+    last_edited_at: new Date().toISOString(),
+    last_edited_by: currentUser.id,
+  };
+
+  if (row?.isFuture) {
+    payload.future_current = document.getElementById(`fc-${rowId}`)?.value || '';
+    payload.future_state   = document.getElementById(`fs-${rowId}`)?.value || '';
+    payload.detail         = document.getElementById(`fd-${rowId}`)?.value || '';
+    payload.summary        = `${payload.future_current} → ${payload.future_state}`;
+  } else {
+    payload.summary = document.getElementById(`sm-${rowId}`)?.value || '';
+    payload.detail  = document.getElementById(`dt-${rowId}`)?.value || '';
+  }
+
+  const { error } = await sb.from('cells').upsert(payload, { onConflict: 'phase_id,row_key' });
+  if (error) {
+    setSaveState(rowId, 'error', error.message);
+    showToast(`Save failed: ${error.message}`, 'error');
+  } else {
+    setSaveState(rowId, 'saved');
+  }
+}
+
+// ─── HEATMAP EDITOR ───────────────────────────────────────────────────────────
+async function renderHeatmap() {
+  const { data: scores } = await sb.from('heat_scores').select('*');
+  const scoreMap = {};
+  (scores||[]).forEach(s => { scoreMap[`${s.dimension_id}_${s.phase_id}`] = s.score; });
+
+  const phaseHeaders = PHASES.map(p =>
+    `<th><div style="display:inline-block;padding:2px 7px;border-radius:5px;background:${p.color_bg};color:${p.color_text};font-weight:800;font-size:9px">${p.short_id}</div></th>`
+  ).join('');
+
+  const rows = HEAT_DIMS.map(d => {
+    const cells = PHASES.map(p => {
+      const v = scoreMap[`${d.id}_${p.id}`] || '';
+      return `<td><select class="heat-select" style="background:${heatColor(v)};color:${heatTextColor(v)}" onchange="saveHeatScore(${d.id},${p.id},this)">
+        <option value="">–</option>
+        ${[1,2,3,4,5].map(n => `<option value="${n}"${n==v?' selected':''}>${n}</option>`).join('')}
+      </select></td>`;
+    }).join('');
+    return `<tr><td class="dim-td">${d.label}</td>${cells}</tr>`;
+  }).join('');
+
+  document.getElementById('editor').innerHTML = `
+    <div class="editor-header">
+      <div class="editor-title">Pain &amp; Friction Heatmap</div>
+      <div class="editor-sub">Score 1 (low) → 5 (high friction) for each dimension × phase. Changes save immediately.</div>
+    </div>
+    <div class="heat-grid">
+      <table class="heat-table" style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden">
+        <thead><tr><th class="dim-th">Dimension</th>${phaseHeaders}<th></th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>`;
+}
+
+function heatColor(s) {
+  const p = {1:'rgba(0,212,126,.25)',2:'rgba(0,212,126,.15)',3:'rgba(245,165,34,.25)',4:'rgba(255,120,50,.3)',5:'rgba(255,60,60,.3)'};
+  return p[s] || 'var(--surface-2)';
+}
+function heatTextColor(s) {
+  if(s==5)return'#FF8080';if(s==4)return'#FFAA60';if(s==3)return'#FFD060';if(s<=2)return'#60E8A0';return'var(--text2)';
+}
+
+async function saveHeatScore(dimId, phaseId, selectEl) {
+  const score = parseInt(selectEl.value);
+  selectEl.style.background = heatColor(score);
+  selectEl.style.color = heatTextColor(score);
+  if (!score) return;
+  const { error } = await sb.from('heat_scores').upsert({ dimension_id:dimId, phase_id:phaseId, score }, { onConflict:'dimension_id,phase_id' });
+  if (error) showToast(`Error: ${error.message}`, 'error');
+  else showToast('Score saved');
+}
+
+// ─── SYSTEMS EDITOR ───────────────────────────────────────────────────────────
+async function renderSystems() {
+  const { data: systems } = await sb.from('systems').select('*,system_phases(phase_id)').order('sort_order');
+
+  const clusterGroups = {};
+  CLUSTERS.forEach(c => { clusterGroups[c.id] = { ...c, systems:[] }; });
+  (systems||[]).forEach(s => {
+    if (clusterGroups[s.cluster_id]) {
+      clusterGroups[s.cluster_id].systems.push({
+        ...s,
+        phase_ids: (s.system_phases||[]).map(sp => sp.phase_id)
+      });
+    }
+  });
+
+  const phaseHeaders = PHASES.map(p =>
+    `<div style="text-align:center;font-size:9px;font-weight:700;font-family:'JetBrains Mono',monospace;color:var(--muted);margin-bottom:4px">${p.short_id}</div>`
+  ).join('');
+
+  const blocks = Object.values(clusterGroups).map(cl => {
+    const sysRows = cl.systems.map(s => {
+      const cbs = PHASES.map(p => `
+        <div class="phase-cb-wrap">
+          <input type="checkbox" class="phase-cb" id="cb-${s.id}-${p.id}" ${s.phase_ids.includes(p.id)?'checked':''}
+            onchange="saveSystemPhase(${s.id},${p.id},this.checked)" title="${p.name}">
+        </div>`).join('');
+      return `<div class="system-row-edit">
+        <input class="system-name-input" value="${esc(s.name)}" placeholder="System name"
+          onchange="saveSystemName(${s.id},this.value)">
+        <div class="phase-checkboxes">${cbs}</div>
+      </div>`;
+    }).join('');
+
+    return `<div class="cluster-block">
+      <div class="cluster-block-hdr">
+        <div class="cluster-color-dot" style="background:${cl.dot_color};box-shadow:0 0 6px ${cl.dot_color}"></div>
+        <div class="cluster-block-name">${cl.name}</div>
+        <div style="display:flex;gap:4px;align-items:flex-end">${PHASES.map(p=>`<div style="width:24px;text-align:center;font-size:8px;font-weight:700;font-family:'JetBrains Mono',monospace;color:var(--muted)">${p.short_id}</div>`).join('')}</div>
+      </div>
+      ${sysRows}
+    </div>`;
+  }).join('');
+
+  document.getElementById('editor').innerHTML = `
+    <div class="editor-header">
+      <div class="editor-title">System Landscape</div>
+      <div class="editor-sub">Edit system names and which phases each system appears in. Changes save immediately.</div>
+    </div>
+    <div class="systems-editor">${blocks}</div>`;
+}
+
+async function saveSystemName(sysId, name) {
+  const { error } = await sb.from('systems').update({ name }).eq('id', sysId);
+  if (error) showToast(`Error: ${error.message}`, 'error');
+  else showToast('System name saved');
+}
+
+async function saveSystemPhase(sysId, phaseId, checked) {
+  if (checked) {
+    await sb.from('system_phases').upsert({ system_id:sysId, phase_id:phaseId });
+  } else {
+    await sb.from('system_phases').delete().eq('system_id', sysId).eq('phase_id', phaseId);
+  }
+}
+
+// ─── ENABLERS EDITOR ─────────────────────────────────────────────────────────
+async function renderEnablers() {
+  const { data: enablers } = await sb.from('enablers').select('*');
+  const map = {};
+  (enablers||[]).forEach(e => { map[e.phase_id] = e; });
+
+  const rows = PHASES.map(p => {
+    const e = map[p.id] || {};
+    return `<div class="enabler-row">
+      <div class="enabler-phase-badge" style="background:${p.color_bg};color:${p.color_text}">${p.short_id}</div>
+      <div style="font-size:11.5px;font-weight:600;color:var(--text2);width:150px;flex-shrink:0">${p.name}</div>
+      <input class="enabler-input" id="en-${p.id}" value="${esc(e.content||'')}"
+        placeholder="Key enabler or investment…"
+        onchange="saveEnabler(${p.id})">
+      <span class="save-indicator" id="save-en-${p.id}"></span>
+    </div>`;
+  }).join('');
+
+  document.getElementById('editor').innerHTML = `
+    <div class="editor-header">
+      <div class="editor-title">Key Enablers</div>
+      <div class="editor-sub">One key enabler or investment per phase, shown in the Roadmap view.</div>
+    </div>
+    ${rows}`;
+}
+
+async function saveEnabler(phaseId) {
+  const val = document.getElementById(`en-${phaseId}`)?.value || '';
+  const ind = document.getElementById(`save-en-${phaseId}`);
+  if (ind) { ind.className='save-indicator saving'; ind.textContent='Saving…'; }
+  const { error } = await sb.from('enablers').upsert({ phase_id:phaseId, content:val }, { onConflict:'phase_id' });
+  if (ind) {
+    ind.className = error ? 'save-indicator error' : 'save-indicator saved';
+    ind.textContent = error ? '✗ Error' : '✓ Saved';
+  }
+  if (error) showToast(`Error: ${error.message}`, 'error');
+}
+
+// ─── PHASES EDITOR ───────────────────────────────────────────────────────────
+async function renderPhases() {
+  const { data: phases } = await sb.from('phases').select('*').order('sort_order');
+  const list = (phases && phases.length) ? phases : PHASES;
+
+  const rows = list.map(p => `
+    <div class="phase-edit-row">
+      <div class="phase-num">${p.short_id}</div>
+      <input type="color" class="phase-color-swatch" value="${p.color_bg}" title="Background colour"
+        onchange="savePhaseColor(${p.id},this.value)">
+      <input class="phase-name-input" value="${esc(p.name)}" placeholder="Phase name"
+        onchange="savePhaseName(${p.id},this.value)">
+    </div>`).join('');
+
+  document.getElementById('editor').innerHTML = `
+    <div class="editor-header">
+      <div class="editor-title">Phase Configuration</div>
+      <div class="editor-sub">Rename phases or update their colour coding. Changes save on blur.</div>
+    </div>
+    <div class="phases-editor">${rows}</div>`;
+}
+
+async function savePhaseName(id, name) {
+  const { error } = await sb.from('phases').update({ name }).eq('id', id);
+  if (error) showToast(`Error: ${error.message}`, 'error');
+  else showToast('Phase name saved');
+}
+
+async function savePhaseColor(id, color) {
+  const { error } = await sb.from('phases').update({ color_bg: color }).eq('id', id);
+  if (error) showToast(`Error: ${error.message}`, 'error');
+  else showToast('Phase colour saved');
+}
+
+// ─── USERS EDITOR ─────────────────────────────────────────────────────────────
+async function renderUsers() {
+  const { data: profiles } = await sb.from('profiles').select('*');
+  const { data: authUsers } = await sb.rpc('get_users_for_admin').catch(() => ({ data: null }));
+
+  const rows = (profiles||[]).map(p => `
+    <tr>
+      <td style="color:var(--text)">${p.full_name || '—'}</td>
+      <td><span style="color:var(--muted);font-family:'JetBrains Mono',monospace;font-size:11px">${p.id.substring(0,8)}…</span></td>
+      <td>
+        <select class="role-select" onchange="saveUserRole('${p.id}',this.value)" ${p.id===currentUser.id?'disabled':''}>
+          <option value="viewer" ${p.role==='viewer'?'selected':''}>Viewer</option>
+          <option value="admin"  ${p.role==='admin' ?'selected':''}>Admin</option>
+        </select>
+      </td>
+      <td><span class="role-badge ${p.role}">${p.role}</span></td>
+    </tr>`).join('');
+
+  document.getElementById('editor').innerHTML = `
+    <div class="editor-header">
+      <div class="editor-title">Team &amp; Access</div>
+      <div class="editor-sub">Manage who has admin access. Users sign up via the main login page. You cannot change your own role.</div>
+    </div>
+    <table class="users-table">
+      <thead><tr><th>Name</th><th>User ID</th><th>Change role</th><th>Current role</th></tr></thead>
+      <tbody>${rows || '<tr><td colspan="4" style="color:var(--muted);padding:20px">No users found.</td></tr>'}</tbody>
+    </table>
+    <div style="margin-top:16px;padding:14px 16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius)">
+      <div style="font-size:11px;font-weight:700;color:var(--muted);margin-bottom:6px;font-family:'JetBrains Mono',monospace">TO MAKE SOMEONE AN ADMIN via SQL</div>
+      <pre style="font-size:11px;color:var(--text2);font-family:'JetBrains Mono',monospace;line-height:1.6">UPDATE profiles SET role = 'admin'
+WHERE id = (SELECT id FROM auth.users WHERE email = 'email@example.com');</pre>
+    </div>`;
+}
+
+async function saveUserRole(userId, role) {
+  const { error } = await sb.from('profiles').update({ role }).eq('id', userId);
+  if (error) showToast(`Error: ${error.message}`, 'error');
+  else showToast(`Role updated to ${role}`);
+}
+
+// ─── HELPERS ─────────────────────────────────────────────────────────────────
+function esc(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ─── EVENTS ───────────────────────────────────────────────────────────────────
+document.getElementById('signOutBtn').addEventListener('click', async () => {
+  await sb.auth.signOut();
+  window.location.replace('/login.html');
+});
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+initAuth();
+</script>
+</body>
+</html>

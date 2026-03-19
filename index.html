@@ -100,32 +100,31 @@ body::after{content:'';position:fixed;inset:0;background-image:radial-gradient(r
 
 /* CURVE ROW */
 .curve-row td{padding:0;border-bottom:1px solid var(--border);background:var(--surface)}
-.curve-td{height:112px}
+.curve-td{height:140px}
 .curve-label-td{position:sticky;left:0;z-index:20;background:var(--surface);border-right:1px solid var(--border)}
-.curve-svg-wrap{position:relative;height:112px}
-.curve-svg{width:100%;height:112px;display:block;overflow:visible}
+.curve-svg-wrap{position:relative;height:140px}
+.curve-svg{width:100%;height:140px;display:block;overflow:visible}
 
 /* DATA CELLS */
-.data-cell{vertical-align:top;padding:5px;border-bottom:1px solid var(--border);border-right:1px solid rgba(255,255,255,.03);cursor:pointer;transition:background var(--ease);height:1px}
-.data-cell:hover .cell-card{border-color:rgba(123,92,255,.35);box-shadow:0 0 0 1px rgba(123,92,255,.15),0 4px 20px rgba(123,92,255,.1);transform:translateY(-1px)}
+.data-cell{vertical-align:top;padding:5px;border-bottom:1px solid var(--border);border-right:1px solid rgba(255,255,255,.03);cursor:pointer;transition:background var(--ease);height:1px;position:relative}
+/* Subtle phase-colour top accent line on each column */
+.data-cell::after{content:'';position:absolute;top:0;left:5px;right:5px;height:1.5px;background:var(--phase-color,transparent);opacity:.5;border-radius:2px;pointer-events:none}
+.data-cell:hover .cell-card{border-color:var(--phase-color,rgba(123,92,255,.35));box-shadow:0 0 0 1px color-mix(in srgb,var(--phase-color,#7B5CFF) 30%,transparent),0 4px 20px color-mix(in srgb,var(--phase-color,#7B5CFF) 15%,transparent);transform:translateY(-1px)}
 .cell-card{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius);padding:10px 12px;height:100%;min-height:100px;transition:all var(--ease);position:relative;overflow:hidden}
-.cell-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:var(--radius) 0 0 var(--radius)}
-.cell-text{font-size:11px;color:#C8D8EE;line-height:1.65;display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden}
-.cell-more{display:inline-block;margin-top:5px;font-size:10px;font-weight:700;color:#A898FF;letter-spacing:-.05px}
+.cell-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;border-radius:var(--radius) 0 0 var(--radius);background:var(--phase-color,var(--accent))}
+.cell-text{font-size:11px;color:#C8D8EE;line-height:1.7;display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden;letter-spacing:.01px}
+.cell-more{display:inline-flex;align-items:center;gap:3px;margin-top:6px;font-size:9.5px;font-weight:700;color:var(--phase-color,#A898FF);letter-spacing:.2px;opacity:.8;transition:opacity var(--ease)}
+.cell-card:hover .cell-more{opacity:1}
 
-/* ROW TINTS — dark version */
+/* ROW TINTS — dark version (::before now uses --phase-color; keep bg tints) */
 tr.row-pain .data-cell{background:rgba(255,60,60,.03)}
 tr.row-pain .cell-card{border-color:rgba(255,90,90,.18);background:rgba(255,50,50,.06)}
-tr.row-pain .cell-card::before{background:linear-gradient(180deg,#FF4C4C,#CC2828)}
 tr.row-works .data-cell{background:rgba(0,210,130,.03)}
 tr.row-works .cell-card{border-color:rgba(0,200,120,.18);background:rgba(0,200,120,.06)}
-tr.row-works .cell-card::before{background:linear-gradient(180deg,#00D47E,#009A55)}
 tr.row-future .data-cell{background:rgba(123,92,255,.03)}
 tr.row-future .cell-card{border-color:rgba(123,92,255,.22);background:rgba(123,92,255,.07)}
-tr.row-future .cell-card::before{background:linear-gradient(180deg,#8B5CFF,#5B3FD6)}
 tr.row-qs .data-cell{background:rgba(245,165,34,.03)}
 tr.row-qs .cell-card{border-color:rgba(245,165,34,.2);background:rgba(245,165,34,.06)}
-tr.row-qs .cell-card::before{background:linear-gradient(180deg,#F5A522,#C47810)}
 
 /* CHIPS */
 .chips{display:flex;flex-wrap:wrap;gap:4px;align-content:flex-start}
@@ -219,6 +218,40 @@ mark{background:rgba(245,200,0,.25);color:#FFD54F;border-radius:2px;padding:0 1p
 .theme-toggle{width:30px;height:30px;border:1px solid rgba(255,255,255,.15);border-radius:7px;background:rgba(255,255,255,.08);cursor:pointer;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.6);transition:all var(--ease);flex-shrink:0}
 .theme-toggle:hover{background:rgba(255,255,255,.14);color:rgba(255,255,255,.9)}
 
+/* ─── INLINE EDIT MODE ─── */
+.edit-mode-btn{display:none;align-items:center;gap:6px;padding:5px 12px;border-radius:7px;font-size:11.5px;font-weight:700;font-family:inherit;cursor:pointer;border:1px solid var(--border);background:var(--surface-2);color:var(--text2);transition:all var(--ease);flex-shrink:0}
+.edit-mode-btn:hover{border-color:var(--border-strong);color:var(--text)}
+.edit-mode-btn.active{background:rgba(123,92,255,.15);border-color:rgba(123,92,255,.35);color:#A898FF}
+.edit-mode-btn svg{width:11px;height:11px;flex-shrink:0}
+
+/* Manually-edited badge — visible only when .is-admin is on body */
+.cell-edit-badge{position:absolute;top:5px;right:5px;width:15px;height:15px;border-radius:4px;background:rgba(123,92,255,.14);border:1px solid rgba(123,92,255,.25);display:flex;align-items:center;justify-content:center;z-index:2;opacity:0;pointer-events:none;transition:opacity var(--ease)}
+.cell-edit-badge svg{width:8px;height:8px;color:#A898FF}
+body.is-admin .cell-edit-badge{opacity:1}
+/* Admin tools link in header */
+.admin-link{padding:5px 12px;border-radius:7px;font-size:11.5px;font-weight:600;font-family:inherit;color:var(--text2);border:1px solid var(--border);background:transparent;text-decoration:none;display:none;align-items:center;gap:5px;transition:all var(--ease);flex-shrink:0}
+.admin-link:hover{border-color:var(--border-strong);color:var(--text)}
+body.is-admin .admin-link{display:flex}
+
+/* Edit form in panel */
+.edit-form{display:flex;flex-direction:column;gap:14px}
+.edit-field{display:flex;flex-direction:column;gap:5px}
+.edit-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.9px;color:var(--muted);font-family:'JetBrains Mono',monospace;display:flex;align-items:center;gap:6px}
+.edit-label-hint{font-size:9px;font-weight:500;text-transform:none;letter-spacing:0;opacity:.65;font-family:'Sora',sans-serif}
+.edit-textarea{width:100%;background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:12px;font-family:'Sora',sans-serif;color:var(--text);resize:vertical;outline:none;line-height:1.65;transition:border-color var(--ease);min-height:80px}
+.edit-textarea:focus{border-color:rgba(123,92,255,.5);background:var(--surface-3)}
+.edit-textarea::placeholder{color:var(--muted)}
+.edit-actions{display:flex;align-items:center;gap:8px;padding-top:4px;flex-wrap:wrap}
+.edit-save-btn{padding:8px 18px;border-radius:7px;font-size:12px;font-weight:700;font-family:inherit;cursor:pointer;border:none;background:var(--accent);color:#fff;transition:all var(--ease)}
+.edit-save-btn:hover:not(:disabled){background:#6B4FE8;box-shadow:0 4px 14px rgba(123,92,255,.35)}
+.edit-save-btn:disabled{opacity:.45;cursor:not-allowed}
+.edit-cancel-btn{padding:8px 14px;border-radius:7px;font-size:12px;font-weight:600;font-family:inherit;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--text2);transition:all var(--ease)}
+.edit-cancel-btn:hover{border-color:var(--border-strong);color:var(--text)}
+.edit-save-ind{font-size:10px;font-family:'JetBrains Mono',monospace;padding:3px 8px;border-radius:5px;transition:all .3s}
+.edit-save-ind.saving{background:rgba(245,165,34,.12);color:var(--amber)}
+.edit-save-ind.saved{background:rgba(0,212,126,.12);color:var(--green)}
+.edit-save-ind.error{background:rgba(255,76,76,.1);color:var(--red)}
+
 /* ═══════════════════════════════════════════
    LIGHT THEME OVERRIDES  (data-theme="light")
    Primary: #005999
@@ -256,6 +289,11 @@ html[data-theme="light"] .search-cnt{color:rgba(255,255,255,.6)}
 html[data-theme="light"] .hdr-badge{background:rgba(255,255,255,.15);color:#fff;border-color:rgba(255,255,255,.2)}
 html[data-theme="light"] .theme-toggle{border-color:rgba(255,255,255,.2);background:rgba(255,255,255,.1);color:rgba(255,255,255,.7)}
 html[data-theme="light"] .theme-toggle:hover{background:rgba(255,255,255,.2);color:#fff}
+html[data-theme="light"] .edit-mode-btn{border-color:rgba(255,255,255,.25);background:rgba(255,255,255,.1);color:rgba(255,255,255,.8)}
+html[data-theme="light"] .edit-mode-btn:hover{background:rgba(255,255,255,.2);color:#fff}
+html[data-theme="light"] .edit-mode-btn.active{background:rgba(255,255,255,.25);border-color:rgba(255,255,255,.5);color:#fff}
+html[data-theme="light"] .admin-link{border-color:rgba(255,255,255,.25);background:rgba(255,255,255,.1);color:rgba(255,255,255,.8)}
+html[data-theme="light"] .admin-link:hover{background:rgba(255,255,255,.2);color:#fff}
 
 /* chevron header row */
 html[data-theme="light"] .phase-corner{background:#004A82;border-right-color:rgba(255,255,255,.1)}
@@ -293,14 +331,13 @@ html[data-theme="light"] .cell-card{background:#fff;border-color:rgba(0,60,110,.
 html[data-theme="light"] .cell-text{color:#3A5472}
 html[data-theme="light"] .cell-more{color:#005999}
 
-/* row tints */
+/* row tints — light (::before uses --phase-color) */
 html[data-theme="light"] tr.row-pain .data-cell{background:#FFF5F5}
 html[data-theme="light"] tr.row-pain .cell-card{background:#FFFBFB;border-color:#FECACA}
 html[data-theme="light"] tr.row-works .data-cell{background:#F0FDF4}
 html[data-theme="light"] tr.row-works .cell-card{background:#F7FFF9;border-color:#BBF7D0}
 html[data-theme="light"] tr.row-future .data-cell{background:#EDF5FF}
 html[data-theme="light"] tr.row-future .cell-card{background:#F5F9FF;border-color:rgba(0,89,153,.2)}
-html[data-theme="light"] tr.row-future .cell-card::before{background:linear-gradient(180deg,#005999,#003D70)}
 html[data-theme="light"] tr.row-qs .data-cell{background:#FFFBEB}
 html[data-theme="light"] tr.row-qs .cell-card{background:#FFFEF5;border-color:#FDE68A}
 
@@ -386,6 +423,14 @@ html[data-theme="light"] mark{background:#FEF08A;color:#0A1E35}
     <span class="search-cnt" id="searchCnt"></span>
   </div>
   <div class="hdr-badge">7 Phases</div>
+  <button class="edit-mode-btn" id="editModeBtn" title="Toggle inline edit mode">
+    <svg viewBox="0 0 16 16" fill="currentColor"><path d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.499.499 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11z"/></svg>
+    Edit Mode
+  </button>
+  <a href="/admin.html" class="admin-link" title="Open admin dashboard">
+    <svg width="11" height="11" viewBox="0 0 16 16" fill="currentColor"><path d="M9.405 1.05c-.413-1.4-2.397-1.4-2.81 0l-.1.34a1.464 1.464 0 0 1-2.105.872l-.31-.17c-1.283-.698-2.686.705-1.987 1.987l.169.311c.446.82.023 1.841-.872 2.105l-.34.1c-1.4.413-1.4 2.397 0 2.81l.34.1a1.464 1.464 0 0 1 .872 2.105l-.17.31c-.698 1.283.705 2.686 1.987 1.987l.311-.169a1.464 1.464 0 0 1 2.105.872l.1.34c.413 1.4 2.397 1.4 2.81 0l.1-.34a1.464 1.464 0 0 1 2.105-.872l.31.17c1.283.698 2.686-.705 1.987-1.987l-.169-.311a1.464 1.464 0 0 1 .872-2.105l.34-.1c1.4-.413 1.4-2.397 0-2.81l-.34-.1a1.464 1.464 0 0 1-.872-2.105l.17-.31c.698-1.283-.705-2.686-1.987-1.987l-.311.169a1.464 1.464 0 0 1-2.105-.872zM8 10.93a2.929 2.929 0 1 1 0-5.86 2.929 2.929 0 0 1 0 5.858z"/></svg>
+    Admin
+  </a>
   <button class="theme-toggle" id="themeToggle" title="Switch to light theme"></button>
   <button class="theme-toggle" id="signOutBtn" title="Sign out"><svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path fill-rule="evenodd" d="M10 12.5a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v2a.5.5 0 0 0 1 0v-2A1.5 1.5 0 0 0 9.5 2h-8A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-2a.5.5 0 0 0-1 0v2z"/><path fill-rule="evenodd" d="M15.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708.708L14.293 7.5H5.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3z"/></svg></button>
 </header>
@@ -439,6 +484,7 @@ html[data-theme="light"] mark{background:#FEF08A;color:#0A1E35}
     <div class="panel-phase-badge" id="panelBadge"></div>
     <div class="panel-title" id="panelTitle"></div>
     <div class="panel-actions">
+      <button class="panel-btn" id="panelEditBtn" title="Edit this cell" style="display:none"><svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.499.499 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11z"/></svg></button>
       <button class="panel-btn" id="copyLinkBtn" title="Copy link"><svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M4.715 6.542 3.343 7.914a3 3 0 1 0 4.243 4.243l1.828-1.829A3 3 0 0 0 8.586 5.5L8 6.086a1.002 1.002 0 0 0-.154.199 2 2 0 0 1 .861 3.337L6.88 11.45a2 2 0 1 1-2.83-2.83l.793-.792a4.018 4.018 0 0 1-.128-1.287z"/><path d="M6.586 4.672A3 3 0 0 0 7.414 9.5l.775-.776a2 2 0 0 1-.896-3.346L9.12 3.55a2 2 0 1 1 2.83 2.83l-.793.792c.112.42.155.855.128 1.287l1.372-1.372a3 3 0 1 0-4.243-4.243z"/></svg></button>
       <button class="panel-btn" id="closePanelBtn" title="Close"><svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/></svg></button>
     </div>
@@ -616,6 +662,10 @@ const SEED_ENABLERS = {
 let APP = { phases:PHASES, cells:SEED_CELLS, heatDims:SEED_HEAT_DIMS, heatScores:SEED_HEAT_SCORES, clusters:SEED_CLUSTERS, enablers:SEED_ENABLERS };
 let panelOpen = false;
 let searchQ = '';
+let isAdmin = false;
+let editMode = false;
+let currentPanelPhaseId = null;
+let currentPanelRowKey = null;
 
 // ─── SUPABASE FETCH ───────────────────────────────────────────────────────────
 async function sbFetch(endpoint) {
@@ -702,17 +752,26 @@ function heatTextColor(score) {
 
 // ─── CURVE ───────────────────────────────────────────────────────────────────
 function computeCurvePoints(phases, heatScores, heatDims, colW) {
-  return phases.map((p, i) => {
+  // First pass — compute raw averages
+  const avgs = phases.map(p => {
     let total = 0, count = 0;
     heatDims.forEach(d => {
       const s = heatScores[`${d.id}_${p.id}`];
       if (s) { total += s; count++; }
     });
-    const avg = count ? total / count : 2.5;
-    const norm = 1 - ((avg - 1) / 4); // 1→1.0 (best), 5→0.0 (worst)
+    return count ? total / count : 2.5;
+  });
+  // Use min-max normalisation so the curve uses the full SVG height
+  // regardless of how tightly the scores are clustered
+  const minA = Math.min(...avgs);
+  const maxA = Math.max(...avgs);
+  const range = maxA - minA || 0.5; // guard against flat data
+  return phases.map((p, i) => {
+    const avg = avgs[i];
+    const norm = 1 - ((avg - minA) / range); // 0 = most friction (bottom), 1 = least (top)
     const x = i * colW + colW / 2;
-    const y = 14 + norm * 82; // 14px to 96px range
-    return { x, y, avg: avg.toFixed(1), phase: p };
+    const y = 20 + norm * 72; // 20px top padding, 72px travel range
+    return { x, y, avg: avg.toFixed(1), raw: avg, phase: p };
   });
 }
 
@@ -793,7 +852,7 @@ function renderMap() {
     </td>
     <td colspan="${phases.length}" class="curve-td">
       <div class="curve-svg-wrap">
-        <svg class="curve-svg" viewBox="0 0 ${totalCurveW} 112" preserveAspectRatio="none">
+        <svg class="curve-svg" viewBox="0 0 ${totalCurveW} 140" preserveAspectRatio="none">
           ${(()=>{
             const lt = isLight();
             const cc = lt ? '#CC2020' : '#FF4C4C';
@@ -803,21 +862,28 @@ function renderMap() {
             const lbl = lt ? 'rgba(58,82,112,.45)' : 'rgba(107,122,150,.55)';
             return `<defs>
             <linearGradient id="curveGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="${cc}" stop-opacity="${lt?'.18':'.28'}"/>
+              <stop offset="0%" stop-color="${cc}" stop-opacity="${lt?'.22':'.38'}"/>
+              <stop offset="80%" stop-color="${cc}" stop-opacity="${lt?'.05':'.08'}"/>
               <stop offset="100%" stop-color="${cc}" stop-opacity="0"/>
             </linearGradient>
             <filter id="glow"><feGaussianBlur stdDeviation="3" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
           </defs>
-          <path d="${path} L ${pts[pts.length-1].x} 112 L ${pts[0].x} 112 Z" fill="url(#curveGrad)"/>
-          <path class="curve-line" d="${path}" fill="none" stroke="${cc}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="${lt?'.5':'.4'}"/>
-          <path d="${path}" fill="none" stroke="${cg}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ${lt?'':'filter="url(#glow)"'}/>
-          ${pts.map(pt => `
-            <circle cx="${pt.x}" cy="${pt.y}" r="4" fill="${cc}" stroke="${cc.replace(')',',0.25)').replace('rgb','rgba')}" stroke-width="5" ${lt?'':'filter="url(#glow)"'}/>
-            <circle cx="${pt.x}" cy="${pt.y}" r="3" fill="${ct}" stroke="${cs}" stroke-width="1.5"/>
-            <text x="${pt.x}" y="${pt.y - 10}" text-anchor="middle" font-size="9.5" font-weight="700" fill="${ct}" font-family="JetBrains Mono,monospace">${pt.avg}</text>
-          `).join('')}
-          <text x="8" y="16" font-size="8.5" fill="${lbl}" font-family="JetBrains Mono,monospace" font-weight="500">LOW</text>
-          <text x="8" y="107" font-size="8.5" fill="${lbl}" font-family="JetBrains Mono,monospace" font-weight="500">HIGH</text>`;
+          <path d="${path} L ${pts[pts.length-1].x} 140 L ${pts[0].x} 140 Z" fill="url(#curveGrad)"/>
+          <path class="curve-line" d="${path}" fill="none" stroke="${cc}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" opacity="${lt?'.35':'.3'}"/>
+          <path d="${path}" fill="none" stroke="${cg}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" ${lt?'':'filter="url(#glow)"'}/>
+          ${pts.map((pt,idx) => {
+            // Colour each dot by relative score: green=low friction, red=high friction
+            const norm = 1 - ((pt.raw - Math.min(...pts.map(p=>p.raw))) / (Math.max(...pts.map(p=>p.raw)) - Math.min(...pts.map(p=>p.raw)) || 1));
+            const dotColor = lt
+              ? (norm > 0.6 ? '#16A34A' : norm > 0.35 ? '#D97706' : '#DC2626')
+              : (norm > 0.6 ? '#00D47E' : norm > 0.35 ? '#F5A522' : '#FF4C4C');
+            return `
+            <circle cx="${pt.x}" cy="${pt.y}" r="7" fill="${dotColor}" opacity="${lt?'.18':'.22'}"/>
+            <circle cx="${pt.x}" cy="${pt.y}" r="4.5" fill="${dotColor}" stroke="${cs}" stroke-width="1.5" ${lt?'':'filter="url(#glow)"'}/>
+            <text x="${pt.x}" y="${pt.y - 13}" text-anchor="middle" font-size="9" font-weight="700" fill="${dotColor}" font-family="JetBrains Mono,monospace">${pt.avg}</text>
+          `}).join('')}
+          <text x="8" y="26" font-size="7.5" fill="${lbl}" font-family="JetBrains Mono,monospace" font-weight="600">LOW FRICTION</text>
+          <text x="8" y="134" font-size="7.5" fill="${lbl}" font-family="JetBrains Mono,monospace" font-weight="600">HIGH FRICTION</text>`;
           })()}
         </svg>
       </div>
@@ -852,11 +918,15 @@ function renderMap() {
         </div>`;
       } else {
         const txt = c.summary || '';
-        inner = `<div class="cell-text">${highlight(txt)}</div>${txt.length > 120 ? '<span class="cell-more">Read more →</span>' : ''}`;
+        inner = `<div class="cell-text">${highlight(txt)}</div>${txt.length > 120 ? '<span class="cell-more">Read more <svg width="9" height="9" viewBox="0 0 16 16" fill="currentColor"><path d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z"/></svg></span>' : ''}`;
       }
 
+      const editedBadge = c.manually_edited
+        ? `<div class="cell-edit-badge" title="Manually edited via UI"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.499.499 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11z"/></svg></div>`
+        : '';
       html += `<td class="data-cell" data-phase="${p.id}" data-row="${row.key}" data-phase-name="${esc(p.name)}" data-row-name="${esc(row.name)}" style="--phase-color:${p.color_bg}">
         <div class="cell-card" style="--phase-color:${p.color_bg}">
+          ${editedBadge}
           <div class="cell-card-content">${inner}</div>
         </div>
       </td>`;
@@ -1013,6 +1083,11 @@ function openPanel(phaseId, rowKey, phaseName, rowName) {
   document.getElementById('detailPanel').classList.add('open');
   document.getElementById('panelOverlay').classList.add('open');
   panelOpen = true;
+  currentPanelPhaseId = phaseId;
+  currentPanelRowKey = rowKey;
+  // Show edit button only when edit mode is active and user is admin
+  const panelEditBtn = document.getElementById('panelEditBtn');
+  if (panelEditBtn) panelEditBtn.style.display = (editMode && isAdmin) ? 'flex' : 'none';
 
   // Update URL hash
   location.hash = `phase=${phaseId}&row=${rowKey}`;
@@ -1080,6 +1155,20 @@ function restoreHash() {
 
 // ─── INIT ─────────────────────────────────────────────────────────────────────
 async function init() {
+  // Check if current user is admin — unlocks edit mode & admin link
+  try {
+    const { data: { session } } = await sb.auth.getSession();
+    if (session) {
+      const { data: profile } = await sb
+        .from('profiles').select('role').eq('id', session.user.id).single();
+      if (profile?.role === 'admin') {
+        isAdmin = true;
+        document.body.classList.add('is-admin');
+        document.getElementById('editModeBtn').style.display = 'flex';
+      }
+    }
+  } catch(e) { /* non-fatal — just means edit mode won't show */ }
+
   await loadFromSupabase();
   renderMap();
   document.getElementById('loadingOverlay').classList.add('hidden');
@@ -1137,6 +1226,131 @@ document.getElementById('signOutBtn').addEventListener('click', async () => {
   await sb.auth.signOut();
   window.location.replace('/login.html');
 });
+
+// ─── EDIT MODE TOGGLE ─────────────────────────────────────────────────────────
+document.getElementById('editModeBtn').addEventListener('click', () => {
+  editMode = !editMode;
+  const btn = document.getElementById('editModeBtn');
+  btn.classList.toggle('active', editMode);
+
+  // If a panel is open and in edit mode, show the edit button
+  const panelEditBtn = document.getElementById('panelEditBtn');
+  if (panelEditBtn) panelEditBtn.style.display = (editMode && panelOpen) ? 'flex' : 'none';
+
+  showToast(editMode ? '✏️ Edit mode on — open any cell to edit' : 'Edit mode off');
+});
+
+// ─── PANEL EDIT BUTTON ────────────────────────────────────────────────────────
+document.getElementById('panelEditBtn').addEventListener('click', () => {
+  if (currentPanelPhaseId && currentPanelRowKey) openEditForm();
+});
+
+// ─── EDIT FORM ────────────────────────────────────────────────────────────────
+function openEditForm() {
+  const phaseId = currentPanelPhaseId;
+  const rowKey  = currentPanelRowKey;
+  const c       = APP.cells[`${phaseId}_${rowKey}`] || {};
+  const isFuture = rowKey === 'future';
+
+  let formHTML = `<div class="edit-form">`;
+
+  if (isFuture) {
+    formHTML += `
+      <div class="edit-field">
+        <label class="edit-label">Current State <span class="edit-label-hint">(shown as "Now" in the grid)</span></label>
+        <textarea class="edit-textarea" id="editFutureCurrent" rows="5" placeholder="Describe the current situation…">${esc(c.future_current||c.summary||'')}</textarea>
+      </div>
+      <div class="edit-field">
+        <label class="edit-label">Future State <span class="edit-label-hint">(shown as "Future" in the grid)</span></label>
+        <textarea class="edit-textarea" id="editFutureState" rows="5" placeholder="Describe the desired future state…">${esc(c.future_state||'')}</textarea>
+      </div>`;
+  } else {
+    formHTML += `
+      <div class="edit-field">
+        <label class="edit-label">Summary <span class="edit-label-hint">(shown in the journey map grid)</span></label>
+        <textarea class="edit-textarea" id="editSummary" rows="4" placeholder="Brief summary shown on the map…">${esc(c.summary||'')}</textarea>
+      </div>
+      <div class="edit-field">
+        <label class="edit-label">Detail <span class="edit-label-hint">(shown in this panel)</span></label>
+        <textarea class="edit-textarea" id="editDetail" rows="7" placeholder="Full detail shown when the panel opens…">${esc(c.detail||c.summary||'')}</textarea>
+      </div>`;
+  }
+
+  formHTML += `
+    <div class="edit-actions">
+      <button class="edit-save-btn" id="editSaveBtn" onclick="saveCell()">Save changes</button>
+      <button class="edit-cancel-btn" onclick="cancelEdit()">Cancel</button>
+      <span class="edit-save-ind" id="editSaveInd"></span>
+    </div>
+  </div>`;
+
+  document.getElementById('panelBody').innerHTML = formHTML;
+  // Hide edit button while form is showing
+  document.getElementById('panelEditBtn').style.display = 'none';
+}
+
+async function saveCell() {
+  const phaseId  = currentPanelPhaseId;
+  const rowKey   = currentPanelRowKey;
+  const isFuture = rowKey === 'future';
+
+  const saveBtn = document.getElementById('editSaveBtn');
+  const saveInd = document.getElementById('editSaveInd');
+  if (!saveBtn) return;
+
+  saveBtn.disabled = true;
+  saveInd.textContent = 'Saving…';
+  saveInd.className = 'edit-save-ind saving';
+
+  const update = {
+    phase_id:       parseInt(phaseId),
+    row_key:        rowKey,
+    manually_edited: true,
+    last_edited_at: new Date().toISOString(),
+  };
+
+  if (isFuture) {
+    update.future_current = (document.getElementById('editFutureCurrent')?.value || '').trim();
+    update.future_state   = (document.getElementById('editFutureState')?.value || '').trim();
+    // Keep summary in sync for grid display
+    update.summary = `${update.future_current.slice(0,70)} → ${update.future_state.slice(0,70)}`;
+  } else {
+    update.summary = (document.getElementById('editSummary')?.value || '').trim();
+    update.detail  = (document.getElementById('editDetail')?.value  || '').trim();
+  }
+
+  try {
+    const { error } = await sb.from('cells').upsert(update, { onConflict: 'phase_id,row_key' });
+    if (error) throw error;
+
+    // Patch local APP state so the map re-renders immediately
+    const key = `${phaseId}_${rowKey}`;
+    APP.cells[key] = { ...(APP.cells[key] || {}), ...update };
+
+    saveInd.textContent = '✓ Saved';
+    saveInd.className = 'edit-save-ind saved';
+
+    // Re-render the map to show the updated cell
+    renderMap();
+
+    // After a short delay, reopen the read panel
+    setTimeout(() => {
+      const phase = APP.phases.find(p => p.id == phaseId);
+      const rowDef = ROW_DEFS.find(r => r.key === rowKey);
+      if (phase && rowDef) openPanel(phaseId, rowKey, phase.name, rowDef.name);
+    }, 800);
+  } catch(e) {
+    saveInd.textContent = '✗ ' + (e.message || 'Save failed');
+    saveInd.className = 'edit-save-ind error';
+    saveBtn.disabled = false;
+  }
+}
+
+function cancelEdit() {
+  const phase  = APP.phases.find(p => p.id == currentPanelPhaseId);
+  const rowDef = ROW_DEFS.find(r => r.key === currentPanelRowKey);
+  if (phase && rowDef) openPanel(currentPanelPhaseId, currentPanelRowKey, phase.name, rowDef.name);
+}
 
 init();
 </script>
