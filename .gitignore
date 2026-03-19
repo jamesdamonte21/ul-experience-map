@@ -3,6 +3,6 @@
 
 # files not needed on Vercel
 *.xlsx
-schema.sql
-seed.sql
 experience_map.png
+
+.vercel
