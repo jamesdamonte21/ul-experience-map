@@ -1667,8 +1667,9 @@ init();
         body: JSON.stringify({ question, context: buildContext() }),
       });
       typingWrap.remove();
-      if (!res.ok) throw new Error(`Error ${res.status}`);
-      const { answer, error } = await res.json();
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || `Error ${res.status}`);
+      const { answer, error } = json;
       if (error) throw new Error(error);
       appendMsg('ai', renderAnswer(answer));
     } catch (e) {
