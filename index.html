@@ -1596,11 +1596,9 @@ init();
     return {
       phases: APP.phases,
       cells: Object.values(APP.cells || {}),
-      heatDimensions: APP.heatDimensions,
+      heatDimensions: APP.heatDims,
       heatScores: APP.heatScores,
-      systems: APP.systems,
-      systemClusters: APP.systemClusters,
-      systemPhases: APP.systemPhases,
+      systemClusters: APP.clusters,
       enablers: Object.values(APP.enablers || {}),
     };
   }
