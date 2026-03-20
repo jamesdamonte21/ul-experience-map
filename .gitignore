@@ -6,3 +6,4 @@
 experience_map.png
 
 .vercel
+.env*.local

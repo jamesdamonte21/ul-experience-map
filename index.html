@@ -73,10 +73,10 @@ body::after{content:'';position:fixed;inset:0;background-image:radial-gradient(r
 .phase-corner{position:sticky;left:0;z-index:60;background:rgba(7,8,13,.95);backdrop-filter:blur(8px);width:var(--label-w);min-width:var(--label-w);padding:10px 14px;border-right:1px solid var(--border)}
 .corner-label{font-size:8.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1.2px;line-height:1.7;font-family:'JetBrains Mono',monospace}
 .phase-chev-cell{width:var(--col-w);min-width:var(--col-w);height:var(--chevron-h);padding:0;background:rgba(7,8,13,.95);backdrop-filter:blur(8px)}
-.phase-chev{height:var(--chevron-h);display:flex;align-items:center;justify-content:center;flex-direction:column;cursor:pointer;position:relative;clip-path:polygon(0 0,calc(100% - 16px) 0,100% 50%,calc(100% - 16px) 100%,0 100%,16px 50%);margin-left:-2px;transition:filter var(--ease)}
+.phase-chev{height:var(--chevron-h);display:flex;align-items:center;justify-content:center;flex-direction:column;cursor:pointer;position:relative;clip-path:polygon(0 0,calc(100% - 16px) 0,100% 50%,calc(100% - 16px) 100%,0 100%,16px 50%);margin-left:-2px;transition:all var(--ease)}
 .phase-chev.first{clip-path:polygon(0 0,calc(100% - 16px) 0,100% 50%,calc(100% - 16px) 100%,0 100%);margin-left:0}
-.phase-chev:hover{filter:brightness(1.14) saturate(1.1)}
-.chev-num{font-size:8.5px;font-weight:700;opacity:.6;letter-spacing:1.2px;text-transform:uppercase;margin-bottom:3px;font-family:'JetBrains Mono',monospace}
+.phase-chev:hover{filter:brightness(1.15) saturate(1.15);transform:translateY(-1px)}
+.chev-num{font-size:8.5px;font-weight:700;opacity:.75;letter-spacing:1.2px;text-transform:uppercase;margin-bottom:3px;font-family:'JetBrains Mono',monospace}
 .chev-name{font-size:11.5px;font-weight:700;text-align:center;padding:0 20px;line-height:1.3;letter-spacing:-.15px}
 
 /* ROW LABELS */
@@ -87,22 +87,22 @@ body::after{content:'';position:fixed;inset:0;background-image:radial-gradient(r
 .row-lbl-name{font-size:11px;font-weight:700;color:var(--text);line-height:1.3;letter-spacing:-.1px}
 .row-lbl-hint{font-size:9px;color:var(--text2);line-height:1.45;font-weight:500}
 
-/* icon variants — dark mode */
-.icon-overview{background:rgba(61,145,255,.12);color:#5BA8FF;border-color:rgba(61,145,255,.2)}
-.icon-people{background:rgba(0,195,122,.12);color:#00D47E;border-color:rgba(0,195,122,.2)}
-.icon-systems{background:rgba(123,92,255,.14);color:#A898FF;border-color:rgba(123,92,255,.25)}
-.icon-pain{background:rgba(255,70,70,.12);color:#FF7070;border-color:rgba(255,70,70,.22)}
-.icon-works{background:rgba(0,210,130,.12);color:#00E07C;border-color:rgba(0,210,130,.22)}
-.icon-workaround{background:rgba(245,165,34,.12);color:#FFC055;border-color:rgba(245,165,34,.22)}
-.icon-questions{background:rgba(245,165,34,.10);color:#FFAA30;border-color:rgba(245,165,34,.18)}
-.icon-future{background:rgba(168,92,255,.13);color:#C898FF;border-color:rgba(168,92,255,.24)}
-.icon-curve{background:rgba(0,196,167,.12);color:#30E8D0;border-color:rgba(0,196,167,.22)}
+/* icon variants — dark mode (brighter, more vibrant) */
+.icon-overview{background:rgba(61,145,255,.18);color:#6DB4FF;border-color:rgba(61,145,255,.3)}
+.icon-people{background:rgba(0,210,130,.18);color:#20FFAA;border-color:rgba(0,210,130,.3)}
+.icon-systems{background:rgba(123,92,255,.20);color:#B8A0FF;border-color:rgba(123,92,255,.35)}
+.icon-pain{background:rgba(255,70,70,.18);color:#FF8585;border-color:rgba(255,70,70,.3)}
+.icon-works{background:rgba(0,220,140,.18);color:#20FFAA;border-color:rgba(0,220,140,.3)}
+.icon-workaround{background:rgba(255,175,50,.18);color:#FFB866;border-color:rgba(255,175,50,.3)}
+.icon-questions{background:rgba(255,175,50,.15);color:#FFB866;border-color:rgba(255,175,50,.28)}
+.icon-future{background:rgba(168,92,255,.20);color:#D8A8FF;border-color:rgba(168,92,255,.35)}
+.icon-curve{background:rgba(0,210,175,.18);color:#40F0E0;border-color:rgba(0,210,175,.3)}
 
 /* CURVE ROW */
 .curve-row td{padding:0;border-bottom:1px solid var(--border);background:var(--surface)}
 .curve-td{height:140px}
 .curve-label-td{position:sticky;left:0;z-index:20;background:var(--surface);border-right:1px solid var(--border)}
-.curve-svg-wrap{position:relative;height:140px}
+.curve-svg-wrap{position:relative;height:140px;margin-top:8px}
 .curve-svg{width:100%;height:140px;display:block;overflow:visible}
 
 /* DATA CELLS */
@@ -131,8 +131,7 @@ tr.row-qs .cell-card{border-color:rgba(245,165,34,.2);background:rgba(245,165,34
 .chip{display:inline-flex;align-items:center;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600;line-height:1.5;white-space:nowrap}
 .chip-sys{background:rgba(61,145,255,.14);color:#7BB8FF;border:1px solid rgba(61,145,255,.22)}
 .chip-role{background:rgba(255,255,255,.06);color:var(--text2);border:1px solid var(--border-strong)}
-.chip-more{background:transparent;color:var(--muted);border:1px dashed var(--border-strong);cursor:pointer}
-.chip-more:hover{background:var(--surface-2);color:var(--text2)}
+.chip-highlight{background:rgba(255,255,0,0.25)!important;border:1px solid #FFD700!important;color:inherit!important}
 
 /* FUTURE CELL */
 .future-cell{display:flex;flex-direction:column;gap:5px}
@@ -146,7 +145,7 @@ tr.row-qs .cell-card{border-color:rgba(245,165,34,.2);background:rgba(245,165,34
 .panel-overlay.open{opacity:1;pointer-events:all}
 .detail-panel{position:fixed;top:0;right:0;bottom:0;width:460px;max-width:100vw;background:var(--surface);border-left:1px solid var(--border);box-shadow:var(--shadow-lg);z-index:201;display:flex;flex-direction:column;transform:translateX(100%);transition:transform 260ms cubic-bezier(.4,0,.2,1)}
 .detail-panel.open{transform:translateX(0)}
-.panel-accent-bar{height:3px;flex-shrink:0}
+.panel-accent-bar{height:6px;flex-shrink:0}
 .panel-hdr{padding:18px 20px 14px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;gap:10px;flex-shrink:0}
 .panel-phase-badge{padding:3px 9px;border-radius:5px;font-size:10px;font-weight:800;flex-shrink:0;margin-top:2px;letter-spacing:.4px;font-family:'JetBrains Mono',monospace}
 .panel-title{flex:1;font-size:14px;font-weight:700;line-height:1.4;color:var(--text);letter-spacing:-.2px}
@@ -171,7 +170,7 @@ tr.row-qs .cell-card{border-color:rgba(245,165,34,.2);background:rgba(245,165,34
 .heat-table{border-collapse:collapse;width:100%;background:var(--surface);border-radius:12px;overflow:hidden;border:1px solid var(--border)}
 .heat-table th{padding:10px 12px;font-size:9px;font-weight:700;text-align:center;border-bottom:1px solid var(--border);white-space:nowrap;text-transform:uppercase;letter-spacing:.6px;color:var(--text2);font-family:'JetBrains Mono',monospace}
 .heat-table th.lh{text-align:left;color:var(--text2);min-width:180px;text-transform:none;font-size:12px;letter-spacing:0;font-family:'Sora',sans-serif}
-.heat-table td{padding:5px 8px;border-bottom:1px solid var(--border)}
+.heat-table td{padding:5px 14px;border-bottom:1px solid var(--border)}
 .heat-table tr:last-child td{border-bottom:none}
 .heat-dim{font-size:12px;font-weight:500;padding:11px 12px;white-space:nowrap;color:var(--text)}
 .heat-score-cell{text-align:center}
@@ -182,7 +181,7 @@ tr.row-qs .cell-card{border-color:rgba(245,165,34,.2);background:rgba(245,165,34
 .systems-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
 .cluster-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px}
 .cluster-hdr{display:flex;align-items:center;gap:10px;margin-bottom:14px}
-.cluster-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;box-shadow:0 0 8px currentColor}
+.cluster-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;box-shadow:0 0 12px currentColor}
 .cluster-name{font-size:13px;font-weight:700;color:var(--text)}
 .sys-row{display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border)}
 .sys-row:last-child{border-bottom:none}
@@ -197,9 +196,9 @@ tr.row-qs .cell-card{border-color:rgba(245,165,34,.2);background:rgba(245,165,34
 .rm-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:11px;font-size:11px;line-height:1.65}
 .rm-card h4{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:5px;color:var(--muted);font-family:'JetBrains Mono',monospace}
 .rm-card p{color:var(--text2)}
-.rm-card.enabler{border-color:rgba(123,92,255,.25);background:rgba(123,92,255,.07)}
-.rm-card.enabler h4{color:#A898FF}
-.rm-card.enabler p{color:#C8B8FF;font-weight:600}
+.rm-card.enabler{border-color:rgba(123,92,255,.35);background:rgba(123,92,255,.12)}
+.rm-card.enabler h4{color:#B8A0FF}
+.rm-card.enabler p{color:#D8C8FF;font-weight:600}
 
 /* LOADING */
 .loading-overlay{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:500;gap:16px;transition:opacity .5s,visibility .5s}
@@ -344,8 +343,7 @@ html[data-theme="light"] tr.row-qs .cell-card{background:#FFFEF5;border-color:#F
 /* chips */
 html[data-theme="light"] .chip-sys{background:#EBF5FF;color:#005999;border-color:rgba(0,89,153,.2)}
 html[data-theme="light"] .chip-role{background:#F1F5F9;color:#334155;border-color:#CBD5E1}
-html[data-theme="light"] .chip-more{background:transparent;color:var(--muted);border-color:#CBD5E1}
-html[data-theme="light"] .chip-more:hover{background:#F1F5F9}
+html[data-theme="light"] .chip-highlight{background:rgba(255,200,0,0.35)!important;border-color:#FFA500!important}
 
 /* future blocks */
 html[data-theme="light"] .fblock.curr{background:#FEF2F2;color:#7F1D1D;border-left-color:#F87171}
@@ -423,6 +421,9 @@ html[data-theme="light"] mark{background:#FEF08A;color:#0A1E35}
     <span class="search-cnt" id="searchCnt"></span>
   </div>
   <div class="hdr-badge">7 Phases</div>
+  <button class="theme-toggle" id="exportBtn" title="Export data as CSV" onclick="exportToCSV()">
+    <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/><path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/></svg>
+  </button>
   <button class="edit-mode-btn" id="editModeBtn" title="Toggle inline edit mode">
     <svg viewBox="0 0 16 16" fill="currentColor"><path d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.499.499 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11z"/></svg>
     Edit Mode
@@ -658,6 +659,17 @@ const SEED_ENABLERS = {
   7:'Systematic closure prompts + structured handoff',
 };
 
+// Vibrant gradient colors for phases (matching chevrons)
+const PHASE_COLORS = [
+  {bg:'linear-gradient(135deg, #8B6FFF 0%, #A890FF 100%)', text:'#FFFFFF', shadow:'rgba(139,111,255,.4)'}, // P1 Purple
+  {bg:'linear-gradient(135deg, #0BC88F 0%, #18E0A5 100%)', text:'#FFFFFF', shadow:'rgba(11,200,143,.4)'}, // P2 Green
+  {bg:'linear-gradient(135deg, #3D91FF 0%, #5BA8FF 100%)', text:'#FFFFFF', shadow:'rgba(61,145,255,.4)'}, // P3 Blue
+  {bg:'linear-gradient(135deg, #FF9F2E 0%, #FFB556 100%)', text:'#FFFFFF', shadow:'rgba(255,159,46,.4)'}, // P4 Orange
+  {bg:'linear-gradient(135deg, #FF5757 0%, #FF7575 100%)', text:'#FFFFFF', shadow:'rgba(255,87,87,.4)'}, // P5 Red
+  {bg:'linear-gradient(135deg, #E05A9C 0%, #F06EAF 100%)', text:'#FFFFFF', shadow:'rgba(224,90,156,.4)'}, // P6 Pink
+  {bg:'linear-gradient(135deg, #6BBF5A 0%, #7DD96A 100%)', text:'#FFFFFF', shadow:'rgba(107,191,90,.4)'}, // P7 Lime
+];
+
 // ─── STATE ────────────────────────────────────────────────────────────────────
 let APP = { phases:PHASES, cells:SEED_CELLS, heatDims:SEED_HEAT_DIMS, heatScores:SEED_HEAT_SCORES, clusters:SEED_CLUSTERS, enablers:SEED_ENABLERS };
 let panelOpen = false;
@@ -789,16 +801,23 @@ function buildCurvePath(pts) {
 // ─── CHIP PARSING ─────────────────────────────────────────────────────────────
 function parseChips(text, type) {
   if (!text) return [];
-  return text.split(',').map(s => s.trim()).filter(Boolean).map(s => ({label:s, type}));
+  return text.split(',').map(s => s.trim()).filter(Boolean).map(s => {
+    const chip = {label: s, type};
+    // Mark chip as highlighted if it matches search query
+    if (searchQ && s.toLowerCase().includes(searchQ)) {
+      chip.highlight = true;
+    }
+    return chip;
+  });
 }
 
-function renderChips(chips, maxShow = 6) {
+function renderChips(chips) {
   if (!chips.length) return '<span style="color:var(--muted);font-size:11px">—</span>';
-  const shown = chips.slice(0, maxShow);
-  const extra = chips.length - maxShow;
   const cls = chips[0].type === 'sys' ? 'chip-sys' : 'chip-role';
-  let html = shown.map(c => `<span class="chip ${cls}">${esc(c.label)}</span>`).join('');
-  if (extra > 0) html += `<span class="chip chip-more">+${extra} more</span>`;
+  const html = chips.map(c => {
+    const highlight = c.highlight ? 'chip-highlight' : '';
+    return `<span class="chip ${cls} ${highlight}">${esc(c.label)}</span>`;
+  }).join('');
   return `<div class="chips">${html}</div>`;
 }
 
@@ -822,17 +841,20 @@ function renderMap() {
   let html = '';
 
   // Phase chevron header
-  html += '<thead><tr class="phase-header-row">';
-  html += `<th class="phase-corner"><div class="corner-label">UL Certification<br>Journey · 7 Phases</div></th>`;
-  phases.forEach((p, i) => {
-    html += `<th class="phase-chev-cell">
-      <div class="phase-chev${i===0?' first':''}" style="background:${p.color_bg};color:${p.color_text}" data-phase="${p.id}">
-        <div class="chev-num">${p.short_id}</div>
-        <div class="chev-name">${esc(p.name)}</div>
-      </div>
-    </th>`;
-  });
-  html += '</tr></thead>';
+    html += '<thead><tr class="phase-header-row">';
+    html += `<th class="phase-corner"><div class="corner-label">UL Certification<br>Journey · 7 Phases</div></th>`;
+  
+    phases.forEach((p, i) => {
+      // Use live color_bg from Supabase for chevron background
+      const c = { bg: p.color_bg, text: '#FFFFFF', shadow: 'rgba(0,0,0,.15)' };
+      html += `<th class="phase-chev-cell">
+        <div class="phase-chev${i===0?' first':''}" style="background:${c.bg};color:${c.text};box-shadow:0 2px 12px ${c.shadow}" data-phase="${p.id}">
+          <div class="chev-num">${p.short_id}</div>
+          <div class="chev-name">${esc(p.name)}</div>
+        </div>
+      </th>`;
+    });
+    html += '</tr></thead>';
 
   // Body
   html += '<tbody>';
@@ -907,10 +929,10 @@ function renderMap() {
 
       if (row.chips && row.chipType === 'sys') {
         const chips = parseChips(c.summary || '', 'sys');
-        inner = chips.length ? renderChips(chips, 5) : `<span style="color:var(--muted);font-size:11px">—</span>`;
+        inner = chips.length ? renderChips(chips) : `<span style="color:var(--muted);font-size:11px">—</span>`;
       } else if (row.chips && row.chipType === 'role') {
         const chips = parseChips(c.summary || '', 'role');
-        inner = chips.length ? renderChips(chips, 4) : `<span style="color:var(--muted);font-size:11px">—</span>`;
+        inner = chips.length ? renderChips(chips) : `<span style="color:var(--muted);font-size:11px">—</span>`;
       } else if (row.isFuture) {
         inner = `<div class="future-cell">
           <div class="fblock curr"><div class="fblock-lbl">Now</div>${highlight(c.future_current||c.summary||'')}</div>
@@ -957,9 +979,13 @@ function renderMap() {
 // ─── RENDER HEATMAP ───────────────────────────────────────────────────────────
 function renderHeatmap() {
   const { phases, heatDims, heatScores } = APP;
+  
   let html = `<table class="heat-table"><thead><tr>
     <th class="lh">Dimension</th>
-    ${phases.map(p => `<th class="heat-phase-th"><span style="display:inline-block;padding:2px 7px;border-radius:5px;background:${p.color_bg};color:${p.color_text};font-weight:800;font-size:9px;letter-spacing:.5px">${p.short_id}</span><br><span style="font-weight:500;font-size:9px;color:var(--text2)">${esc(p.name)}</span></th>`).join('')}
+    ${phases.map((p, idx) => {
+      const c = PHASE_COLORS[idx] || PHASE_COLORS[0];
+      return `<th class="heat-phase-th"><span style="display:inline-block;padding:3px 8px;border-radius:5px;background:${c.bg};color:${c.text};font-weight:800;font-size:9px;letter-spacing:.5px">${p.short_id}</span><br><span style="font-weight:500;font-size:9px;color:var(--text2)">${esc(p.name)}</span></th>`;
+    }).join('')}
     <th style="color:var(--text2);font-size:10px">Row avg</th>
   </tr></thead><tbody>`;
 
@@ -991,6 +1017,7 @@ function renderHeatmap() {
 function renderSystems() {
   const { phases, clusters } = APP;
   const phaseMap = {};
+  
   phases.forEach(p => phaseMap[p.id] = p);
 
   let html = clusters.map(cl => {
@@ -998,7 +1025,9 @@ function renderSystems() {
       const pips = s.phases.sort((a,b)=>a-b).map(pid => {
         const p = phaseMap[pid];
         if (!p) return '';
-        return `<div class="phase-pip" style="background:${p.color_bg};color:${p.color_text}" title="${esc(p.name)}">${p.short_id.replace('P','')}</div>`;
+        const idx = pid - 1;
+        const c = PHASE_COLORS[idx] || PHASE_COLORS[0];
+        return `<div class="phase-pip" style="background:${c.bg};color:${c.text}" title="${esc(p.name)}">${p.short_id.replace('P','')}</div>`;
       }).join('');
       return `<div class="sys-row"><span class="sys-name">${esc(s.name)}</span><div class="sys-phases">${pips}</div></div>`;
     }).join('');
@@ -1013,11 +1042,13 @@ function renderSystems() {
 // ─── RENDER ROADMAP ───────────────────────────────────────────────────────────
 function renderRoadmap() {
   const { phases, cells, enablers } = APP;
-  let html = phases.map(p => {
+  
+  let html = phases.map((p, idx) => {
     const future = cells[`${p.id}_future`] || {};
     const enabler = enablers[p.id] || '';
+    const c = PHASE_COLORS[idx] || PHASE_COLORS[0];
     return `<div class="rm-col">
-      <div class="rm-phase-hdr" style="background:${p.color_bg};color:${p.color_text}">${esc(p.name)}</div>
+      <div class="rm-phase-hdr" style="background:${c.bg};color:${c.text}">${esc(p.name)}</div>
       <div class="rm-card">
         <h4>Current State</h4>
         <p>${esc(future.future_current || '—')}</p>
@@ -1042,12 +1073,16 @@ function openPanel(phaseId, rowKey, phaseName, rowName) {
   const phase = phases.find(p => p.id == phaseId) || {};
   const rowDef = ROW_DEFS.find(r => r.key === rowKey) || {};
 
+  // Use vibrant gradient colors matching chevrons
+  const phaseIndex = phases.findIndex(p => p.id == phaseId);
+  const phaseColor = PHASE_COLORS[phaseIndex] || PHASE_COLORS[0];
+
   document.getElementById('panelBadge').textContent = phase.short_id || '';
-  document.getElementById('panelBadge').style.background = phase.color_bg || '#F1F5F9';
-  document.getElementById('panelBadge').style.color = phase.color_text || '#fff';
+  document.getElementById('panelBadge').style.background = phaseColor.bg;
+  document.getElementById('panelBadge').style.color = phaseColor.text;
   document.getElementById('panelTitle').textContent = `${rowName} — ${phaseName}`;
   const accentBar = document.getElementById('panelAccentBar');
-  if (accentBar) accentBar.style.background = phase.color_bg || '#4F46E5';
+  if (accentBar) accentBar.style.background = phaseColor.bg;
 
   let body = '';
 
@@ -1067,7 +1102,10 @@ function openPanel(phaseId, rowKey, phaseName, rowName) {
     const cls = type === 'sys' ? 'chip-sys' : 'chip-role';
     body += `<div class="panel-sec">
       <div class="panel-sec-lbl">${rowName}</div>
-      <div class="chips" style="gap:6px;margin-bottom:16px">${chips.map(ch => `<span class="chip ${cls}" style="font-size:12px;padding:4px 10px">${esc(ch.label)}</span>`).join('')}</div>
+      <div class="chips" style="gap:6px;margin-bottom:16px">${chips.map(ch => {
+        const highlight = ch.highlight ? 'chip-highlight' : '';
+        return `<span class="chip ${cls} ${highlight}" style="font-size:12px;padding:4px 10px">${esc(ch.label)}</span>`;
+      }).join('')}</div>
     </div>`;
     if (c.detail && c.detail !== c.summary) {
       body += `<div class="panel-sec"><div class="panel-sec-lbl">Notes</div><div class="panel-content">${esc(c.detail)}</div></div>`;
@@ -1113,7 +1151,9 @@ function doSearch(q) {
   renderMap();
   let hits = 0;
   document.querySelectorAll('.data-cell').forEach(el => {
-    const hasMatch = el.querySelector('mark');
+    const hasTextMatch = el.querySelector('mark');
+    const hasChipMatch = el.querySelector('.chip-highlight');
+    const hasMatch = hasTextMatch || hasChipMatch;
     el.style.opacity = hasMatch ? '1' : '0.25';
     if (hasMatch) hits++;
   });
@@ -1150,6 +1190,57 @@ function restoreHash() {
     const phase = APP.phases.find(p => p.id == params.phase);
     const row = ROW_DEFS.find(r => r.key === params.row);
     if (phase && row) openPanel(params.phase, params.row, phase.name, row.name);
+  }
+}
+
+// ─── EXPORT TO CSV ────────────────────────────────────────────────────────────
+async function exportToCSV() {
+  try {
+    // Fetch all data
+    const cells = await sbFetch('cells?select=*,phase:phases(short_id,name)');
+    
+    if (!cells || cells.length === 0) {
+      showToast('No data to export', 'error');
+      return;
+    }
+
+    // Create CSV headers
+    const headers = ['Phase ID', 'Phase', 'Row Type', 'Summary', 'Detail', 'Future Current', 'Future State'];
+    
+    // Create CSV rows
+    const rows = cells.map(cell => [
+      cell.phase?.short_id || '',
+      cell.phase?.name || '',
+      cell.row_key || '',
+      (cell.summary || '').replace(/"/g, '""'), // Escape quotes
+      (cell.detail || '').replace(/"/g, '""'),
+      (cell.future_current || '').replace(/"/g, '""'),
+      (cell.future_state || '').replace(/"/g, '""')
+    ]);
+
+    // Build CSV content
+    let csv = headers.map(h => `"${h}"`).join(',') + '\n';
+    rows.forEach(row => {
+      csv += row.map(cell => `"${cell}"`).join(',') + '\n';
+    });
+
+    // Create download link
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    const timestamp = new Date().toISOString().split('T')[0];
+    
+    link.setAttribute('href', url);
+    link.setAttribute('download', `ul-experience-map-${timestamp}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    showToast('✓ CSV exported successfully');
+  } catch (error) {
+    console.error('Export error:', error);
+    showToast('Export failed', 'error');
   }
 }
 

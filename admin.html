@@ -205,6 +205,12 @@ html,body{height:100%;font-family:'Sora',-apple-system,sans-serif;background:var
         <div class="nav-item-dot" style="background:#98AECA"></div>
         <span class="nav-item-label">Team & Access</span>
       </div>
+      <div class="sidebar-divider"></div>
+      <a href="/import.html" class="nav-item" style="text-decoration:none">
+        <div class="nav-item-dot" style="background:#00D47E"></div>
+        <span class="nav-item-label">📊 Import Excel</span>
+        
+      </a>
     </nav>
 
     <!-- EDITOR -->
@@ -652,7 +658,6 @@ async function savePhaseColor(id, color) {
 // ─── USERS EDITOR ─────────────────────────────────────────────────────────────
 async function renderUsers() {
   const { data: profiles } = await sb.from('profiles').select('*');
-  const { data: authUsers } = await sb.rpc('get_users_for_admin').catch(() => ({ data: null }));
 
   const rows = (profiles||[]).map(p => `
     <tr>

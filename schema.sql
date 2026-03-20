@@ -85,6 +85,24 @@ ALTER TABLE systems         ENABLE ROW LEVEL SECURITY;
 ALTER TABLE system_phases   ENABLE ROW LEVEL SECURITY;
 ALTER TABLE enablers        ENABLE ROW LEVEL SECURITY;
 
+-- Drop existing policies if they exist
+DROP POLICY IF EXISTS "public_read" ON phases;
+DROP POLICY IF EXISTS "public_read" ON cells;
+DROP POLICY IF EXISTS "public_read" ON heat_dimensions;
+DROP POLICY IF EXISTS "public_read" ON heat_scores;
+DROP POLICY IF EXISTS "public_read" ON system_clusters;
+DROP POLICY IF EXISTS "public_read" ON systems;
+DROP POLICY IF EXISTS "public_read" ON system_phases;
+DROP POLICY IF EXISTS "public_read" ON enablers;
+DROP POLICY IF EXISTS "auth_write" ON phases;
+DROP POLICY IF EXISTS "auth_write" ON cells;
+DROP POLICY IF EXISTS "auth_write" ON heat_dimensions;
+DROP POLICY IF EXISTS "auth_write" ON heat_scores;
+DROP POLICY IF EXISTS "auth_write" ON system_clusters;
+DROP POLICY IF EXISTS "auth_write" ON systems;
+DROP POLICY IF EXISTS "auth_write" ON system_phases;
+DROP POLICY IF EXISTS "auth_write" ON enablers;
+
 -- Anyone can read
 CREATE POLICY "public_read" ON phases          FOR SELECT USING (true);
 CREATE POLICY "public_read" ON cells           FOR SELECT USING (true);
