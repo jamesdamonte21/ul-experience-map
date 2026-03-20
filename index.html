@@ -1592,7 +1592,7 @@ init();
   }
 
   function buildContext() {
-    if (!window.APP) return {};
+    if (typeof APP === 'undefined') return {};
 
     // Build cells with phase name and row type attached
     const cells = Object.entries(APP.cells || {}).map(([key, c]) => {
