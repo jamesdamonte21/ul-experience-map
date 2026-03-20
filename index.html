@@ -1593,13 +1593,35 @@ init();
 
   function buildContext() {
     if (!window.APP) return {};
+
+    // Build cells with phase name and row type attached
+    const cells = Object.entries(APP.cells || {}).map(([key, c]) => {
+      const [phaseId, rowKey] = key.split('_');
+      const phase = APP.phases.find(p => p.id == phaseId);
+      return { phase: phase?.name || phaseId, rowType: rowKey, summary: c.summary, detail: c.detail, futureCurrent: c.future_current, futureState: c.future_state };
+    });
+
+    // Build heat scores as readable rows: { dimension, phase, score }
+    const heatScores = [];
+    (APP.heatDims || []).forEach(dim => {
+      (APP.phases || []).forEach(ph => {
+        const score = APP.heatScores[`${dim.id}_${ph.id}`];
+        if (score != null) heatScores.push({ dimension: dim.label, phase: ph.name, score });
+      });
+    });
+
+    // Build enablers with phase name
+    const enablers = Object.entries(APP.enablers || {}).map(([phaseId, content]) => {
+      const phase = APP.phases.find(p => p.id == phaseId);
+      return { phase: phase?.name || phaseId, content };
+    });
+
     return {
-      phases: APP.phases,
-      cells: Object.values(APP.cells || {}),
-      heatDimensions: APP.heatDims,
-      heatScores: APP.heatScores,
-      systemClusters: APP.clusters,
-      enablers: Object.values(APP.enablers || {}),
+      phases: APP.phases.map(p => ({ name: p.name, shortId: p.short_id })),
+      cells,
+      heatScores,
+      systemClusters: (APP.clusters || []).map(c => ({ name: c.name, systems: c.systems?.map(s => s.name) })),
+      enablers,
     };
   }
 
