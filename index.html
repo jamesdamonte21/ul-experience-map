@@ -389,6 +389,84 @@ html[data-theme="light"] .hdr-logo svg path{fill:#fff}
 /* toast & mark */
 html[data-theme="light"] .toast{background:#0A1E35;color:#fff;border-color:rgba(255,255,255,.08)}
 html[data-theme="light"] mark{background:#FEF08A;color:#0A1E35}
+
+/* ─── AI CHAT ──────────────────────────────────────────────────────────────── */
+.ai-chat-btn{
+  position:fixed;bottom:24px;right:24px;z-index:900;
+  width:52px;height:52px;border-radius:50%;border:none;cursor:pointer;
+  background:var(--accent);color:#fff;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 4px 20px rgba(123,92,255,.45);
+  transition:transform 170ms ease,box-shadow 170ms ease;
+}
+.ai-chat-btn:hover{transform:scale(1.08);box-shadow:0 6px 28px rgba(123,92,255,.6)}
+.ai-chat-btn.open{transform:scale(0.9);opacity:.7}
+
+.ai-chat-panel{
+  position:fixed;bottom:88px;right:24px;z-index:900;
+  width:360px;max-height:520px;
+  background:var(--surface);border:1px solid var(--border-strong);
+  border-radius:16px;display:flex;flex-direction:column;
+  box-shadow:0 20px 60px rgba(0,0,0,.5);
+  opacity:0;transform:translateY(16px) scale(.97);pointer-events:none;
+  transition:opacity 200ms ease,transform 200ms ease;
+}
+.ai-chat-panel.open{opacity:1;transform:translateY(0) scale(1);pointer-events:all}
+
+.ai-chat-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 16px;border-bottom:1px solid var(--border);
+}
+.ai-chat-header-left{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700;font-family:'JetBrains Mono',monospace;color:var(--text);text-transform:uppercase;letter-spacing:.6px}
+.ai-chat-header-left svg{color:var(--accent)}
+.ai-chat-close{background:none;border:none;cursor:pointer;color:var(--muted);padding:4px;border-radius:4px;display:flex;transition:color 150ms}
+.ai-chat-close:hover{color:var(--text)}
+
+.ai-chat-messages{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;min-height:0}
+
+.ai-chat-welcome p{font-size:12px;color:var(--text2);margin-bottom:12px;line-height:1.6}
+.ai-chat-suggestions{display:flex;flex-direction:column;gap:7px}
+.ai-suggestion{
+  text-align:left;background:var(--surface-2);border:1px solid var(--border);
+  border-radius:8px;padding:9px 12px;font-size:11.5px;color:var(--text2);
+  cursor:pointer;font-family:'Sora',sans-serif;transition:border-color 150ms,color 150ms;
+}
+.ai-suggestion:hover{border-color:var(--accent);color:var(--text)}
+
+.ai-msg{display:flex;flex-direction:column;gap:4px;max-width:90%}
+.ai-msg.user{align-self:flex-end;align-items:flex-end}
+.ai-msg.ai{align-self:flex-start}
+.ai-msg-bubble{
+  padding:10px 13px;border-radius:12px;font-size:12.5px;line-height:1.6;
+  font-family:'Sora',sans-serif;
+}
+.ai-msg.user .ai-msg-bubble{background:var(--accent);color:#fff;border-bottom-right-radius:3px}
+.ai-msg.ai .ai-msg-bubble{background:var(--surface-2);color:var(--text);border-bottom-left-radius:3px}
+.ai-msg.ai .ai-msg-bubble ul{margin:6px 0 0 0;padding-left:16px;display:flex;flex-direction:column;gap:4px}
+.ai-msg.ai .ai-msg-bubble li{color:var(--text2)}
+.ai-msg-label{font-size:9.5px;font-family:'JetBrains Mono',monospace;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;padding:0 4px}
+
+.ai-typing{display:flex;gap:4px;align-items:center;padding:10px 13px;background:var(--surface-2);border-radius:12px;border-bottom-left-radius:3px}
+.ai-typing span{width:6px;height:6px;border-radius:50%;background:var(--muted);animation:ai-bounce 1.2s infinite}
+.ai-typing span:nth-child(2){animation-delay:.2s}
+.ai-typing span:nth-child(3){animation-delay:.4s}
+@keyframes ai-bounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-5px)}}
+
+.ai-chat-input-row{display:flex;gap:8px;padding:12px 14px;border-top:1px solid var(--border)}
+.ai-chat-input{
+  flex:1;background:var(--surface-2);border:1px solid var(--border);border-radius:8px;
+  padding:9px 12px;font-size:12.5px;font-family:'Sora',sans-serif;color:var(--text);outline:none;
+  transition:border-color 150ms;
+}
+.ai-chat-input::placeholder{color:var(--muted)}
+.ai-chat-input:focus{border-color:rgba(123,92,255,.5)}
+.ai-chat-send{
+  background:var(--accent);border:none;border-radius:8px;
+  width:36px;height:36px;display:flex;align-items:center;justify-content:center;
+  color:#fff;cursor:pointer;flex-shrink:0;transition:filter 150ms;
+}
+.ai-chat-send:hover{filter:brightness(1.15)}
+.ai-chat-send:disabled{opacity:.5;cursor:not-allowed;filter:none}
 </style>
 </head>
 <body>
@@ -495,6 +573,39 @@ html[data-theme="light"] mark{background:#FEF08A;color:#0A1E35}
 
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
+
+<!-- AI CHAT -->
+<button class="ai-chat-btn" id="aiChatBtn" title="Ask the Map">
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M8 10h8M8 14h5"/></svg>
+</button>
+
+<div class="ai-chat-panel" id="aiChatPanel">
+  <div class="ai-chat-header">
+    <div class="ai-chat-header-left">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      <span>Ask the Map</span>
+    </div>
+    <button class="ai-chat-close" id="aiChatClose" title="Close">
+      <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/></svg>
+    </button>
+  </div>
+  <div class="ai-chat-messages" id="aiChatMessages">
+    <div class="ai-chat-welcome">
+      <p>Ask anything about the certification experience map. Try one of these:</p>
+      <div class="ai-chat-suggestions">
+        <button class="ai-suggestion" data-q="Where is the most friction across all phases?">Where is the most friction?</button>
+        <button class="ai-suggestion" data-q="Summarize the future state vision across all phases">Summarize the future state</button>
+        <button class="ai-suggestion" data-q="Which systems appear in the most phases?">Which systems are most used?</button>
+      </div>
+    </div>
+  </div>
+  <div class="ai-chat-input-row">
+    <input class="ai-chat-input" id="aiChatInput" type="text" placeholder="Ask a question…" autocomplete="off">
+    <button class="ai-chat-send" id="aiChatSend">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+    </button>
+  </div>
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
@@ -1444,6 +1555,131 @@ function cancelEdit() {
 }
 
 init();
+
+// ─── AI CHAT ──────────────────────────────────────────────────────────────────
+(function() {
+  const btn   = document.getElementById('aiChatBtn');
+  const panel = document.getElementById('aiChatPanel');
+  const msgs  = document.getElementById('aiChatMessages');
+  const input = document.getElementById('aiChatInput');
+  const send  = document.getElementById('aiChatSend');
+
+  let open = false;
+
+  function toggleChat() {
+    open = !open;
+    panel.classList.toggle('open', open);
+    btn.classList.toggle('open', open);
+    if (open) input.focus();
+  }
+
+  btn.addEventListener('click', toggleChat);
+  document.getElementById('aiChatClose').addEventListener('click', toggleChat);
+
+  // Suggestion chips
+  msgs.querySelectorAll('.ai-suggestion').forEach(el => {
+    el.addEventListener('click', () => ask(el.dataset.q));
+  });
+
+  input.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); submit(); } });
+  send.addEventListener('click', submit);
+
+  function submit() {
+    const q = input.value.trim();
+    if (!q) return;
+    input.value = '';
+    ask(q);
+  }
+
+  function buildContext() {
+    if (!window.APP) return {};
+    return {
+      phases: APP.phases,
+      cells: Object.values(APP.cells || {}),
+      heatDimensions: APP.heatDimensions,
+      heatScores: APP.heatScores,
+      systems: APP.systems,
+      systemClusters: APP.systemClusters,
+      systemPhases: APP.systemPhases,
+      enablers: Object.values(APP.enablers || {}),
+    };
+  }
+
+  function appendMsg(role, html) {
+    // Remove welcome block on first real message
+    const welcome = msgs.querySelector('.ai-chat-welcome');
+    if (welcome) welcome.remove();
+
+    const wrap = document.createElement('div');
+    wrap.className = `ai-msg ${role}`;
+    const label = document.createElement('div');
+    label.className = 'ai-msg-label';
+    label.textContent = role === 'user' ? 'You' : 'AI';
+    const bubble = document.createElement('div');
+    bubble.className = 'ai-msg-bubble';
+    bubble.innerHTML = html;
+    wrap.appendChild(label);
+    wrap.appendChild(bubble);
+    msgs.appendChild(wrap);
+    msgs.scrollTop = msgs.scrollHeight;
+    return bubble;
+  }
+
+  function renderAnswer(text) {
+    const lines = text.split('\n');
+    let out = '';
+    let inList = false;
+    for (const line of lines) {
+      const stripped = line.trim();
+      if (stripped.startsWith('- ') || stripped.startsWith('• ')) {
+        if (!inList) { out += '<ul>'; inList = true; }
+        out += `<li>${esc(stripped.slice(2))}</li>`;
+      } else {
+        if (inList) { out += '</ul>'; inList = false; }
+        if (stripped) out += `<p style="margin-bottom:6px">${esc(stripped)}</p>`;
+      }
+    }
+    if (inList) out += '</ul>';
+    return out;
+  }
+
+  function esc(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+  async function ask(question) {
+    send.disabled = true;
+    appendMsg('user', esc(question));
+
+    // Typing indicator
+    const typingWrap = document.createElement('div');
+    typingWrap.className = 'ai-msg ai';
+    typingWrap.innerHTML = '<div class="ai-typing"><span></span><span></span><span></span></div>';
+    msgs.appendChild(typingWrap);
+    msgs.scrollTop = msgs.scrollHeight;
+
+    try {
+      const { data: { session } } = await sb.auth.getSession();
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': session ? `Bearer ${session.access_token}` : '',
+        },
+        body: JSON.stringify({ question, context: buildContext() }),
+      });
+      typingWrap.remove();
+      if (!res.ok) throw new Error(`Error ${res.status}`);
+      const { answer, error } = await res.json();
+      if (error) throw new Error(error);
+      appendMsg('ai', renderAnswer(answer));
+    } catch (e) {
+      typingWrap.remove();
+      appendMsg('ai', `<span style="color:#FF9090">Sorry, something went wrong: ${esc(e.message)}</span>`);
+    } finally {
+      send.disabled = false;
+      input.focus();
+    }
+  }
+})();
 </script>
 </body>
 </html>
